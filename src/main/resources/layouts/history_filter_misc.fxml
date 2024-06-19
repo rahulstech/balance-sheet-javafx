@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="rahulstech.jfx.balancesheet.controller.HistoryFilterMiscController"
+      spacing="18"
+      style="-fx-padding: 24px;">
+
+    <HBox spacing="10">
+        <Label text="Date Start" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+        <DatePicker fx:id="startDatePicker"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Date End" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+        <DatePicker fx:id="endDatePicker"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Type" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+        <ComboBox fx:id="typeComboBox" promptText="Select Transaction Type"
+                  editable="false">
+        </ComboBox>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Type" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+        <ComboBox fx:id="orderByComboBox" promptText="Select Order By"
+                  editable="false">
+        </ComboBox>
+    </HBox>
+</VBox>

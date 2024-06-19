@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox prefWidth="900" prefHeight="600" xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.ChartBrowserController">
+    <children>
+        <VBox>
+            <ListView VBox.vgrow="ALWAYS" fx:id="chartListView"/>
+        </VBox>
+        <VBox HBox.hgrow="ALWAYS" fx:id="chartPane" >
+        </VBox>
+    </children>
+</HBox>

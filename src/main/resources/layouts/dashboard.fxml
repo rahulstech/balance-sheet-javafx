@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="rahulstech.jfx.balancesheet.controller.DashboardController">
+    <padding>
+        <Insets top="18" left="18" bottom="18" right="18"/>
+    </padding>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Button text="Import" fx:id="importButton"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox alignment="CENTER">
+            <VBox alignment="CENTER">
+                <ImageView>
+                    <image>
+                        <Image url="@../icons/app_icon.png" preserveRatio="true" smooth="true"/>
+                    </image>
+                </ImageView>
+                <VBox.margin>
+                    <Insets bottom="24"/>
+                </VBox.margin>
+            </VBox>
+            <HBox alignment="CENTER" spacing="10">
+                <Button text="Accounts" fx:id="accountsButton"/>
+                <Button text="Histories" fx:id="historiesButton"/>
+                <Button text="Charts" fx:id="chartsButton"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,66 @@
+package rahulstech.jfx.balancesheet.controller;
+
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.control.ListView;
+import javafx.collections.FXCollections;
+import javafx.scene.layout.VBox;
+import rahulstech.jfx.balancesheet.util.ViewLoader;
+
+import java.util.ResourceBundle;
+
+public class ChartBrowserController extends Controller {
+
+    private ObservableList<String> CHARTS = FXCollections.observableArrayList(
+            "Chart by Type Monthly",
+            "Chart by Category Monthly"
+    );
+
+    @FXML
+    private ListView<String> chartListView;
+
+    @FXML
+    private VBox chartPane;
+
+    private MonthlyTypeChartController monthlyTypeChartController;
+
+    private MonthlyCategoryChartController monthlyCategoryChartController;
+
+    @Override
+    protected void onInitialize(ResourceBundle res) {
+        chartListView.setItems(CHARTS);
+        chartListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            displayChart(chartListView.getSelectionModel().getSelectedIndex());
+        });
+    }
+
+    private void displayChart(int selection) {
+        if (selection == 0) {
+            createMonthlyTypeChart();
+        }
+        else if (selection == 1) {
+            createMonthlyCategoryChart();
+        }
+    }
+
+    private void createMonthlyTypeChart() {
+        if (null == monthlyTypeChartController) {
+            ViewLoader loader = getViewLoader().setFxml("monthly_type_chart.fxml").load();
+            this.monthlyTypeChartController = loader.getController();
+        }
+        Parent root = this.monthlyTypeChartController.getRoot();
+        chartPane.getChildren().clear();
+        chartPane.getChildren().add(root);
+    }
+
+    private void createMonthlyCategoryChart() {
+        if (null == monthlyCategoryChartController) {
+            ViewLoader loader = getViewLoader().setFxml("monthly_category_chart.fxml").load();
+            this.monthlyCategoryChartController = loader.getController();
+        }
+        Parent root = this.monthlyCategoryChartController.getRoot();
+        chartPane.getChildren().clear();
+        chartPane.getChildren().add(root);
+    }
+}

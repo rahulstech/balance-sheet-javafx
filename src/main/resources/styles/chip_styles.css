@@ -1,0 +1,25 @@
+/* chipstyles.css */
+.chip {
+    -fx-background-color: #e0e0e0;
+    -fx-background-radius: 16px;
+    -fx-padding: 4px 8px;
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+.chip-label {
+    -fx-font-size: 14px;
+}
+
+.chip-close-button {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill: #a70000;
+    -fx-cursor: hand;
+}
+
+.chip-close-button:hover {
+    -fx-text-fill: #ffe9e9;
+    -fx-background-radius: 50%;
+    -fx-background-color: #a70000
+}

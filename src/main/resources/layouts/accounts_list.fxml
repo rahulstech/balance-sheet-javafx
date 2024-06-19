@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.AccountsListController">
+    <top>
+        <VBox spacing="16" style="-fx-padding: 12px 10px">
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Search account" />
+                <Button text="New Account" onAction="#handleAddAccount"/>
+                <Button text="Refresh" onAction="#handleRefresh"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ListView fx:id="accountListView" />
+    </center>
+</BorderPane>
+

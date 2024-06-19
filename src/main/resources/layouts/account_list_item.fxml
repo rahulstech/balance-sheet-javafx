@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"  spacing="6" fx:controller="rahulstech.jfx.balancesheet.controller.AccountListItemController">
+    <Label fx:id="nameLabel" style="-fx-font-weight: bold; -fx-font-size: 18pt;"/>
+    <Label fx:id="balanceLabel" style="-fx-font-size: 12pt;" />
+</VBox>
+

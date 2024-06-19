@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.HBox?>
+
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="600" prefHeight="400"
+
+      spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.HistoryFilterController">
+    <HBox style="-fx-padding: 16px"
+            alignment="TOP_RIGHT" spacing="12">
+        <Button text="Reset" onAction="#handleReset"/>
+        <Button text="Filter" onAction="#handleFilter"/>
+    </HBox>
+
+    <TabPane prefWidth="500" prefHeight="400" HBox.hgrow="ALWAYS">
+        <tabs>
+            <Tab closable="false" text="Accounts" fx:id="tabAccounts">
+            </Tab>
+            <Tab closable="false" text="Categories" fx:id="tabCategories">
+            </Tab>
+            <Tab closable="false" text="Miscellaneous" fx:id="tabMisc">
+
+            </Tab>
+        </tabs>
+    </TabPane>
+
+</VBox>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.HBox?>
+
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="600" prefHeight="400" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <HBox alignment="TOP_RIGHT" spacing="12">
+        <Button text="Cancel" onAction="#handleCancel"/>
+        <Button text="Add Selected Only" onAction="#handleAddSelected"/>
+    </HBox>
+
+    <TabPane prefWidth="500" prefHeight="400" HBox.hgrow="ALWAYS">
+        <tabs>
+            <Tab closable="false" text="Accounts" fx:id="tabAccounts">
+            </Tab>
+            <Tab closable="false" text="People" fx:id="tabPeople">
+            </Tab>
+        </tabs>
+    </TabPane>
+
+</VBox>
