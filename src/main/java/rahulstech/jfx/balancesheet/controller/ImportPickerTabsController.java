@@ -1,7 +1,6 @@
 package rahulstech.jfx.balancesheet.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Tab;
 import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.BalancesheetApp;
@@ -26,16 +25,15 @@ public class ImportPickerTabsController extends Controller {
     private Tab tabPeople;
 
     @FXML
-    private DatePicker startDatePicker;
-
-    @FXML
-    private DatePicker endDatePicker;
+    private Tab tabMisc;
 
     private final DataModel model;
 
     private AccountImportPickerController accountsController;
 
     private PersonImportPickerController peopleController;
+
+    private ImportMiscTabController miscTabController;
 
     private Future<?> insertTask;
 
@@ -45,24 +43,16 @@ public class ImportPickerTabsController extends Controller {
 
     @Override
     protected void onInitialize(ResourceBundle res) {
-        this.accountsController = (AccountImportPickerController) loadAccountsPickerView(model.getAccounts());
-        this.peopleController = (PersonImportPickerController) loadPeoplePickerView(model.getPeople());
+        accountsController = new AccountImportPickerController(model.getAccounts());
+        getViewLoader().setController(accountsController).setFxml("picker_list_layout.fxml").load();
         tabAccounts.setContent(accountsController.getRoot());
+
+        this.peopleController = new PersonImportPickerController(model.getPeople());
+        getViewLoader().setController(peopleController).setFxml("picker_list_layout.fxml").load();
         tabPeople.setContent(peopleController.getRoot());
-    }
 
-    private Controller loadAccountsPickerView(List<Account> accounts) {
-        AccountImportPickerController controller = new AccountImportPickerController(accounts);
-        return loadPickerView(controller);
-    }
-
-    private Controller loadPeoplePickerView(List<Person> people) {
-        PersonImportPickerController controller = new PersonImportPickerController(people);
-        return loadPickerView(controller);
-    }
-
-    private Controller loadPickerView(Controller controller) {
-        return getViewLoader().setController(controller).setFxml("picker_list_layout.fxml").load().getController();
+        miscTabController = getViewLoader().setFxml("import_misc_tab.fxml").load().getController();
+        tabMisc.setContent(miscTabController.getRoot());
     }
 
     @FXML
@@ -81,13 +71,19 @@ public class ImportPickerTabsController extends Controller {
 
         List<Account> accounts = accountsController.getAllSelectedAccounts();
         List<Person> people = peopleController.getAllSelectedPeople();
-        LocalDate startDate = startDatePicker.getValue();
-        LocalDate endDate = endDatePicker.getValue();
+        LocalDate startDate = miscTabController.getStartDate();
+        LocalDate endDate = miscTabController.getEndDate();
+        List<ImportMiscTabController.ImportOptions> importOptions = miscTabController.getSelectedImportOptions();
+
         InsertTask.FilterData filterData = new InsertTask.FilterData();
         filterData.endDate = endDate;
         filterData.startDate = startDate;
         filterData.accounts = accounts;
         filterData.people = people;
+        filterData.importAccounts = importOptions.contains(ImportMiscTabController.ImportOptions.Accounts);
+        filterData.importCreditTransactions = importOptions.contains(ImportMiscTabController.ImportOptions.Credit);
+        filterData.importDebitTransactions = importOptions.contains(ImportMiscTabController.ImportOptions.Debit);
+        filterData.importTransfers = importOptions.contains(ImportMiscTabController.ImportOptions.Transfers);
 
         ExecutorService executor = BalancesheetApp.getAppExecutor();
         InsertTask task = new InsertTask(model,filterData);

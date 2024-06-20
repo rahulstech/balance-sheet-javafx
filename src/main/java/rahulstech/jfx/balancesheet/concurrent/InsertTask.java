@@ -6,7 +6,6 @@ import rahulstech.jfx.balancesheet.database.dao.AccountDao;
 import rahulstech.jfx.balancesheet.database.dao.TransactionHistoryDao;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
-import rahulstech.jfx.balancesheet.database.exception.DatabaseException;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
@@ -26,21 +25,19 @@ public class InsertTask extends Task<Boolean> {
         public List<Person> people;
         public LocalDate startDate;
         public LocalDate endDate;
+        public  boolean importAccounts = true;
+        public boolean importCreditTransactions = true;
+        public boolean importDebitTransactions = true;
+        public boolean importTransfers = true;
     }
 
     private final DataModel model;
-    private List<rahulstech.jfx.balancesheet.json.model.Account> selectedAccounts;
-    private List<Person> selectedPeople;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private final FilterData filterData;
     private Map<Long,Account> map_accountId_account;
 
     public InsertTask(DataModel model, FilterData filterData) {
         this.model = model;
-        this.selectedAccounts = filterData.accounts;
-        this.selectedPeople = filterData.people;
-        this.startDate = filterData.startDate;
-        this.endDate = filterData.endDate;
+        this.filterData = filterData;
     }
 
     @Override
@@ -48,25 +45,31 @@ public class InsertTask extends Task<Boolean> {
         DataModel model = this.model;
         List<Transaction> transactions = model.getTransactions();
         List<MoneyTransfer> moneyTransfers = model.getMoney_transfers();
-        List<rahulstech.jfx.balancesheet.json.model.Account> selected_accounts = this.selectedAccounts;
-        List<Person> selected_people = this.selectedPeople;
-        LocalDate startDate= this.startDate;
-        LocalDate endDate = this.endDate;
+        List<rahulstech.jfx.balancesheet.json.model.Account> selected_accounts = this.filterData.accounts;
+        List<Person> selected_people = this.filterData.people;
+        LocalDate startDate= this.filterData.startDate;
+        LocalDate endDate = this.filterData.endDate;
 
         List<Account> accounts = convertTo_entity_Account(selected_accounts);
         map_accountId_account = createAccountIdAccountMap(accounts);
         List<TransactionHistory> histories = new ArrayList<>();
-        if (null != transactions) {
+        if ((filterData.importCreditTransactions || filterData.importDebitTransactions) && null != transactions) {
             List<Transaction> filteredTransactions = filterTransactionsByNotDeleted(transactions);
             filteredTransactions = filterTransactionsByDateRange(filteredTransactions,startDate,endDate);
             filteredTransactions = filterTransactionsByAccounts(filteredTransactions,selected_accounts);
             filteredTransactions = filterTransactionsByPeople(filteredTransactions,selected_people);
+            if (!filterData.importCreditTransactions) {
+                filteredTransactions = filteredTransactions.stream().filter(t->t.getType()!=1).collect(Collectors.toList());
+            }
+            if (!filterData.importDebitTransactions){
+                filteredTransactions = filteredTransactions.stream().filter(t->t.getType()!=0).collect(Collectors.toList());
+            }
             for (Transaction t : filteredTransactions) {
                 TransactionHistory h = convertTransaction(t);
                 histories.add(h);
             }
         }
-        if (null != moneyTransfers) {
+        if (filterData.importTransfers && null != moneyTransfers) {
             List<MoneyTransfer> filteredTransfers = filterMoneyTransfersByAccounts(moneyTransfers,selected_accounts);
             for (MoneyTransfer mt : filteredTransfers) {
                 TransactionHistory h = convertMoneyTransfer(mt);
@@ -76,8 +79,9 @@ public class InsertTask extends Task<Boolean> {
 
         BalancesheetDb db = BalancesheetDb.getInstance();
         return db.inTransaction(()->{
-          if (insertAccounts(db.getAccountDao(),accounts)
-                  && insertTransactionHistories(db.getTransactionHistoryDao(),histories)) {
+            boolean accountsInserted = !this.filterData.importAccounts || insertAccounts(db.getAccountDao(), accounts);
+            boolean historiesInserted = insertTransactionHistories(db.getTransactionHistoryDao(), histories);
+          if (accountsInserted && historiesInserted) {
               return true;
           }
           throw new SQLException("database insert fail");
@@ -127,10 +131,10 @@ public class InsertTask extends Task<Boolean> {
         return transactions.stream().filter(t-> {
             boolean inRange = true;
             if (null!=start) {
-                inRange &= start.compareTo(t.getDate()) <= 0;
+                inRange &= !start.isAfter(t.getDate());
             }
             if (null!=end) {
-                inRange &= end.compareTo(t.getDate()) >= 0;
+                inRange &= !end.isBefore(t.getDate());
             }
             return inRange;
                 })

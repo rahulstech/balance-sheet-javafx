@@ -7,22 +7,10 @@
 
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
 <VBox prefWidth="600" prefHeight="400" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <HBox style="-fx-padding: 12px 16px;" spacing="10">
-        <VBox HBox.hgrow="ALWAYS" alignment="TOP_LEFT" spacing="10">
-            <Label text="Date Start" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
-            <DatePicker fx:id="startDatePicker"/>
-        </VBox>
-        <VBox spacing="10">
-            <Label text="Date End" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
-            <DatePicker fx:id="endDatePicker"/>
-        </VBox>
-        <VBox alignment="TOP_RIGHT" spacing="12">
-            <Button prefWidth="140" text="Cancel" onAction="#handleCancel"/>
-            <Button prefWidth="140"  text="Add Selected Only" onAction="#handleAddSelected"/>
-        </VBox>
+    <HBox alignment="TOP_RIGHT" style="-fx-padding: 12px 16px;" spacing="10">
+        <Button prefWidth="140" text="Cancel" onAction="#handleCancel"/>
+        <Button prefWidth="140"  text="Add Selected Only" onAction="#handleAddSelected"/>
     </HBox>
 
     <TabPane prefWidth="500" prefHeight="400" HBox.hgrow="ALWAYS">
@@ -30,6 +18,8 @@
             <Tab closable="false" text="Accounts" fx:id="tabAccounts">
             </Tab>
             <Tab closable="false" text="People" fx:id="tabPeople">
+            </Tab>
+            <Tab closable="false" text="Misc" fx:id="tabMisc">
             </Tab>
         </tabs>
     </TabPane>

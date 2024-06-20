@@ -30,7 +30,7 @@
     </HBox>
 
     <HBox spacing="10">
-        <Label text="Type" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+        <Label text="Order By" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
         <ComboBox fx:id="orderByComboBox" promptText="Select Order By"
                   editable="false">
         </ComboBox>
