@@ -1,6 +1,7 @@
 package rahulstech.jfx.balancesheet.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Tab;
 import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.BalancesheetApp;
@@ -10,6 +11,7 @@ import rahulstech.jfx.balancesheet.json.model.DataModel;
 import rahulstech.jfx.balancesheet.json.model.Person;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +25,12 @@ public class ImportPickerTabsController extends Controller {
     @FXML
     private Tab tabPeople;
 
+    @FXML
+    private DatePicker startDatePicker;
+
+    @FXML
+    private DatePicker endDatePicker;
+
     private final DataModel model;
 
     private AccountImportPickerController accountsController;
@@ -30,8 +38,6 @@ public class ImportPickerTabsController extends Controller {
     private PersonImportPickerController peopleController;
 
     private Future<?> insertTask;
-
-    private Stage progressDialogWindow;
 
     public ImportPickerTabsController(DataModel model) {
         this.model = model;
@@ -72,26 +78,36 @@ public class ImportPickerTabsController extends Controller {
                 "Adding imported values into database in progress. please wait till finish.");
         stage.setOnCloseRequest(e->e.consume());
         stage.show();
-        this.progressDialogWindow = stage;
 
         List<Account> accounts = accountsController.getAllSelectedAccounts();
         List<Person> people = peopleController.getAllSelectedPeople();
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+        InsertTask.FilterData filterData = new InsertTask.FilterData();
+        filterData.endDate = endDate;
+        filterData.startDate = startDate;
+        filterData.accounts = accounts;
+        filterData.people = people;
 
         ExecutorService executor = BalancesheetApp.getAppExecutor();
-        InsertTask task = new InsertTask(model,accounts,people);
-        task.setOnSucceeded(e->onInsertComplete(task.getValue(),null));
-        task.setOnFailed(e->onInsertComplete(false,task.getException()));
+        InsertTask task = new InsertTask(model,filterData);
+        task.setOnSucceeded(e->{
+            stage.close();
+            onInsertComplete(task.getValue(),null);
+        });
+        task.setOnFailed(e->{
+            stage.close();
+            onInsertComplete(false,task.getException());
+        });
         insertTask = executor.submit(task);
     }
 
     private void onInsertComplete(boolean success, Throwable error) {
         if (success) {
-            progressDialogWindow.close();
             getWindow().close();
         }
         else {
             error.printStackTrace();
-            progressDialogWindow.close();
             DialogUtil.alertError(getWindow(),"Error","Fail to insert imported data into database. Please try again.");
         }
     }

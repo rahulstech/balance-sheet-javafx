@@ -17,6 +17,7 @@
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10">
             <Button text="Import" fx:id="importButton"/>
+            <Button text="Delete Database" onAction="#handleDeleteDatabaseButtonClick"/>
         </HBox>
     </top>
     <center>

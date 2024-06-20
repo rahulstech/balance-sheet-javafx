@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml">
     <VBox spacing="10">
-        <HBox spacing="10" VBox.vgrow="NEVER">
+        <HBox spacing="10" VBox.vgrow="NEVER" style="-fx-padding: 8px;">
             <Button fx:id="selectAllButton" text="Select All" />
         </HBox>
         <ListView fx:id="listView" VBox.vgrow="ALWAYS" />

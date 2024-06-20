@@ -1,5 +1,6 @@
 package rahulstech.jfx.balancesheet.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
@@ -7,6 +8,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.ImportTask;
+import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
@@ -142,4 +144,13 @@ public class DashboardController extends Controller {
     }
 
     private File lastUsedDirectory;
+
+    @FXML
+    private void handleDeleteDatabaseButtonClick(ActionEvent event) {
+        DialogUtil.alertConfirmation(getWindow(),
+                "Warning Delete","This action will cause permanent loss of data. " +
+                        "This action is not undoable. Are you sure?",
+                "Yes Delete", BalancesheetDb::deleteDatabase,
+                "No Cancel",null);
+    }
 }

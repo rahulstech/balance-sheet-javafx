@@ -14,57 +14,61 @@ import rahulstech.jfx.balancesheet.json.model.MoneyTransfer;
 import rahulstech.jfx.balancesheet.json.model.Person;
 import rahulstech.jfx.balancesheet.json.model.Transaction;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InsertTask extends Task<Boolean> {
 
-    private final DataModel model;
-    private final List<rahulstech.jfx.balancesheet.json.model.Account> selectedAccounts;
-    private final List<Person> selectedPeople;
+    public static class FilterData {
+        public List<rahulstech.jfx.balancesheet.json.model.Account> accounts;
+        public List<Person> people;
+        public LocalDate startDate;
+        public LocalDate endDate;
+    }
 
+    private final DataModel model;
+    private List<rahulstech.jfx.balancesheet.json.model.Account> selectedAccounts;
+    private List<Person> selectedPeople;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Map<Long,Account> map_accountId_account;
 
-    public InsertTask(DataModel model, List<rahulstech.jfx.balancesheet.json.model.Account> accounts, List<Person> people) {
+    public InsertTask(DataModel model, FilterData filterData) {
         this.model = model;
-        this.selectedAccounts = accounts;
-        this.selectedPeople = people;
+        this.selectedAccounts = filterData.accounts;
+        this.selectedPeople = filterData.people;
+        this.startDate = filterData.startDate;
+        this.endDate = filterData.endDate;
     }
 
     @Override
     protected Boolean call() throws Exception {
         DataModel model = this.model;
-        List<rahulstech.jfx.balancesheet.json.model.Account> json_account = null == selectedAccounts ? model.getAccounts() : selectedAccounts;
         List<Transaction> transactions = model.getTransactions();
-        List<Person> selected_people = this.selectedPeople;
-        boolean isAllPeopleSelected = selected_people == null || selected_people.isEmpty();
         List<MoneyTransfer> moneyTransfers = model.getMoney_transfers();
+        List<rahulstech.jfx.balancesheet.json.model.Account> selected_accounts = this.selectedAccounts;
+        List<Person> selected_people = this.selectedPeople;
+        LocalDate startDate= this.startDate;
+        LocalDate endDate = this.endDate;
 
-        List<Account> accounts = convertTo_entity_Account(json_account);
+        List<Account> accounts = convertTo_entity_Account(selected_accounts);
         map_accountId_account = createAccountIdAccountMap(accounts);
         List<TransactionHistory> histories = new ArrayList<>();
         if (null != transactions) {
-            for (Transaction t : transactions) {
-                if (t.isDeleted()) {
-                    continue;
-                }
-                if (!isAllPeopleSelected) {
-                    boolean matched = false;
-                    for (Person p : selected_people) {
-                        if (Objects.equals(t.getPerson_id(), p.get_id())) {
-                            matched = true;
-                            break;
-                        }
-                    }
-                    if (!matched) {
-                        continue;
-                    }
-                }
+            List<Transaction> filteredTransactions = filterTransactionsByNotDeleted(transactions);
+            filteredTransactions = filterTransactionsByDateRange(filteredTransactions,startDate,endDate);
+            filteredTransactions = filterTransactionsByAccounts(filteredTransactions,selected_accounts);
+            filteredTransactions = filterTransactionsByPeople(filteredTransactions,selected_people);
+            for (Transaction t : filteredTransactions) {
                 TransactionHistory h = convertTransaction(t);
                 histories.add(h);
             }
         }
         if (null != moneyTransfers) {
-            for (MoneyTransfer mt : moneyTransfers) {
+            List<MoneyTransfer> filteredTransfers = filterMoneyTransfersByAccounts(moneyTransfers,selected_accounts);
+            for (MoneyTransfer mt : filteredTransfers) {
                 TransactionHistory h = convertMoneyTransfer(mt);
                 histories.add(h);
             }
@@ -76,8 +80,69 @@ public class InsertTask extends Task<Boolean> {
                   && insertTransactionHistories(db.getTransactionHistoryDao(),histories)) {
               return true;
           }
-          throw new DatabaseException("database insert fail");
+          throw new SQLException("database insert fail");
         });
+    }
+
+    private List<Long> getAccountIds(List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
+        if (null==accounts || accounts.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> accountIds = new ArrayList<>();
+        for (rahulstech.jfx.balancesheet.json.model.Account account : accounts) {
+            accountIds.add(account.get_id());
+        }
+        return accountIds;
+    }
+
+    private List<Transaction> filterTransactionsByNotDeleted(List<Transaction> transactions) {
+        List<Transaction> filtered = new ArrayList<>();
+        for (Transaction t : transactions) {
+            if (!t.isDeleted()) {
+                filtered.add(t);
+            }
+        }
+        return filtered;
+    }
+
+    private List<Transaction> filterTransactionsByAccounts(List<Transaction> transactions, List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
+        List<Long> accountIds = getAccountIds(accounts);
+        return transactions.stream().filter(t-> accountIds.contains(t.getAccount_id()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Transaction> filterTransactionsByPeople(List<Transaction> transactions, List<Person> people) {
+        if (null==people || people.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> peopleIds = new ArrayList<>();
+        for (Person person : people) {
+            peopleIds.add(person.get_id());
+        }
+        return transactions.stream().filter(t-> peopleIds.contains(t.getPerson_id()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Transaction> filterTransactionsByDateRange(List<Transaction> transactions, LocalDate start, LocalDate end) {
+        return transactions.stream().filter(t-> {
+            boolean inRange = true;
+            if (null!=start) {
+                inRange &= start.compareTo(t.getDate()) <= 0;
+            }
+            if (null!=end) {
+                inRange &= end.compareTo(t.getDate()) >= 0;
+            }
+            return inRange;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<MoneyTransfer> filterMoneyTransfersByAccounts(List<MoneyTransfer> transfers, List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
+        List<Long> accountIds = getAccountIds(accounts);
+        return transfers.stream().filter(t->
+            accountIds.contains(t.getPayee_account_id())
+                    || accountIds.contains(t.getPayer_account_id()))
+                    .collect(Collectors.toList());
     }
 
     private boolean insertAccounts(AccountDao accountDao, List<Account> accounts) {
@@ -85,7 +150,6 @@ public class InsertTask extends Task<Boolean> {
     }
 
     private boolean insertTransactionHistories(TransactionHistoryDao transactionHistoryDao, List<TransactionHistory> histories) {
-        System.out.println("adding histories="+histories.size());
         return transactionHistoryDao.createMultipleTransactionHistory(histories);
     }
 
