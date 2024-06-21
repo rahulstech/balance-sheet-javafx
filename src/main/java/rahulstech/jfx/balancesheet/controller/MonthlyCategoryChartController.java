@@ -134,7 +134,7 @@ public class MonthlyCategoryChartController extends Controller {
                 Tooltip.install(avgDataPoint.getNode(), avgTooltip);
             }
         },t->t.getException().printStackTrace());
-        BalancesheetApp.getAppExecutor().submit(task);
+        getApp().getAppExecutor().submit(task);
     }
 
     @FXML
@@ -189,7 +189,7 @@ public class MonthlyCategoryChartController extends Controller {
         Task<List<MonthlyCategoryModel>> task = TaskUtils.getMonthlyCategoroyChartQueryTask(startMonth,endMonth,categories,
                 t-> setMonthlyCategoryData(t.getValue()),
                 t->t.getException().printStackTrace());
-        chartDataTask = BalancesheetApp.getAppExecutor().submit(task);
+        chartDataTask = getApp().getAppExecutor().submit(task);
     }
 
     private void populateComboBoxes() {
@@ -199,7 +199,7 @@ public class MonthlyCategoryChartController extends Controller {
         endMonthComboBox.setButtonCell(newComboBoxListCellForYearMonth());
 
         // Populate month start and month end combo-boxes with sample data
-        BalancesheetApp.getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
+        getApp().getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
                     YearMonth[] result = task.getValue();
                     YearMonth minMonth = result[0];
                     YearMonth maxMonth = result[1];

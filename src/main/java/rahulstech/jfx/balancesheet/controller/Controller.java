@@ -4,6 +4,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.util.ViewLoader;
 
@@ -69,4 +70,8 @@ public class Controller implements Initializable {
     }
 
     protected void onInitialize(ResourceBundle res) {}
+
+    public BalancesheetApp getApp() {
+        return BalancesheetApp.getInstance();
+    }
 }

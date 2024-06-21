@@ -190,7 +190,7 @@ public class InputTransactionHistoryController extends Controller {
             dialog.close();
             DialogUtil.alertError(getWindow(),"Error","History not saved");
         });
-        BalancesheetApp.getAppExecutor().submit(task);
+        getApp().getAppExecutor().submit(task);
     }
 
     private List<Category> getSelectedCategories() {

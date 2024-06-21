@@ -8,25 +8,34 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="rahulstech.jfx.balancesheet.controller.DashboardController">
     <padding>
         <Insets top="18" left="18" bottom="18" right="18"/>
     </padding>
+
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10">
-            <Button text="Import" fx:id="importButton"/>
-            <Button text="Delete Database" onAction="#handleDeleteDatabaseButtonClick"/>
+            <Button graphicTextGap="6" text="Import" fx:id="importButton">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-download"/>
+                </graphic>
+            </Button>
+            <Button graphicTextGap="6" text="Delete Database" onAction="#handleDeleteDatabaseButtonClick">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-delete" iconColor="orangered"/>
+                </graphic>
+            </Button>
         </HBox>
     </top>
     <center>
         <VBox alignment="CENTER">
             <VBox alignment="CENTER">
                 <ImageView>
-                    <image>
-                        <Image url="@../icons/app_icon.png" preserveRatio="true" smooth="true"/>
-                    </image>
+                    <Image url="@../icons/app_icon.png" preserveRatio="true" smooth="true"/>
                 </ImageView>
                 <VBox.margin>
                     <Insets bottom="24"/>

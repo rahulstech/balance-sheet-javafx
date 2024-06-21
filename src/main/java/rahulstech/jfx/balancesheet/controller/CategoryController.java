@@ -10,6 +10,7 @@ import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -59,7 +60,7 @@ public class CategoryController extends Controller {
             Task<List<Category>> task = TaskUtils.filterCategory(categories,newValue,
                     t->setCategories(t.getValue()),
                     t-> t.getException().printStackTrace());
-            filterTask = BalancesheetApp.getAppExecutor().submit(task);  // Submit the new task
+            filterTask = getApp().getAppExecutor().submit(task);  // Submit the new task
         });
         loadCategories();
     }
@@ -73,17 +74,11 @@ public class CategoryController extends Controller {
             setCategories(this.categories);
                 },
                 t -> t.getException().printStackTrace());
-        queryTask = BalancesheetApp.getAppExecutor().submit(task);
+        queryTask = getApp().getAppExecutor().submit(task);
     }
 
     private void setCategories(List<Category> value) {
-        ObservableList<Category> categories;
-        if (null == value || value.isEmpty()) {
-            categories = FXCollections.emptyObservableList();
-        }
-        else {
-            categories = FXCollections.observableList(value);
-        }
+        ObservableList<Category> categories = FXCollections.observableList(value);
         categoryList.setItems(categories);
     }
 
@@ -112,18 +107,14 @@ public class CategoryController extends Controller {
             Task<Category> createTask = TaskUtils.saveCategory(newCategory,
                     task -> {
                 Category category = task.getValue();
-                if (categoryList.getItems().isEmpty()) {
-                    categoryList.setItems(FXCollections.observableArrayList(category));
-                }
-                else {
-                    categoryList.getItems().add(category);
-                }
+                categoryList.getItems().add(category);
                     },
                     task -> {
-                DialogUtil.alertError(getWindow(),"Save Error","Category not create");
                         task.getException().printStackTrace();
+                DialogUtil.alertError(getWindow(),"Save Error","Category not create");
+
                     });
-            BalancesheetApp.getAppExecutor().execute(createTask);
+            getApp().getAppExecutor().execute(createTask);
         }
     }
 
@@ -148,7 +139,7 @@ public class CategoryController extends Controller {
                         DialogUtil.alertError(getWindow(),"Error","Fail to delete category. Please try again.");
                                 System.err.println(t.getException());
                             });
-                    BalancesheetApp.getAppExecutor().
+                    getApp().getAppExecutor().
                             execute(task);
                 },"Cancel",null);
     }

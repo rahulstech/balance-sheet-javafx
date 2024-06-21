@@ -1,0 +1,13 @@
+/* styles.css */
+
+/* Define color variables using a base class */
+
+
+@import url("button_theme.css");
+
+.root {
+    primaryColor: #6200EE;
+    primaryColorDark: #3700B3;
+    whiteColor: #FFFFFF;
+}
+

@@ -5,18 +5,15 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.util.Callback;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
-import rahulstech.jfx.balancesheet.ResourceLoader;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
+import rahulstech.jfx.balancesheet.util.ViewLoader;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -48,15 +45,11 @@ public class AccountsListController extends Controller {
                             setGraphic(null);
                             setContextMenu(null);
                         } else {
-                            FXMLLoader loader = ResourceLoader.loadFXML("account_list_item.fxml");
-                            try {
-                                setGraphic(loader.load());
-                                AccountListItemController controller = loader.getController();
-                                controller.setAccount(account);
-                                setContextMenu(createContextMenu(account));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            ViewLoader loader = getViewLoader().setFxml("account_list_item.fxml").load();
+                            setGraphic(loader.getRoot());
+                            AccountListItemController controller = loader.getController();
+                            controller.setAccount(account);
+                            setContextMenu(createContextMenu(account));
                         }
                     }
                 };
@@ -67,7 +60,7 @@ public class AccountsListController extends Controller {
             if (currentTask != null) {
                 currentTask.cancel(true);  // Cancel the currently running task
             }
-            ExecutorService executor = BalancesheetApp.getAppExecutor();
+            ExecutorService executor = getApp().getAppExecutor();
             Task<List<Account>> task = TaskUtils.filterAccount(accounts, newValue, t-> setAccounts(t.getValue()),
                     t-> t.getException().printStackTrace());
             currentTask = executor.submit(task);  // Submit the new task
@@ -114,7 +107,7 @@ public class AccountsListController extends Controller {
                         t.getException().printStackTrace();
                         DialogUtil.alertError(getWindow(),"Error","Account not deleted.");
                     });
-                    BalancesheetApp.getAppExecutor().
+                    getApp().getAppExecutor().
                             execute(task);
                 },"Cancel",null);
 
@@ -145,12 +138,11 @@ public class AccountsListController extends Controller {
             this.accounts = t.getValue();
             setAccounts(this.accounts);
         },t->t.getException().printStackTrace());
-        queryTask = BalancesheetApp.getAppExecutor().submit(task);
+        queryTask = getApp().getAppExecutor().submit(task);
     }
 
     private void setAccounts(List<Account> values) {
-        ObservableList<Account> accounts = null == values || values.isEmpty() ? FXCollections.emptyObservableList()
-                : FXCollections.observableList(values);
+        ObservableList<Account> accounts = FXCollections.observableList(values);
         accountListView.setItems(accounts);
     }
 }

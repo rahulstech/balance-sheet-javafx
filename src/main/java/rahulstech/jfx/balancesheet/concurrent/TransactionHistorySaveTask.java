@@ -9,6 +9,7 @@ import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 
+@SuppressWarnings("ALL")
 public class TransactionHistorySaveTask extends Task<TransactionHistory> {
 
     private final TransactionHistory history;
@@ -65,7 +66,7 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
     }
 
     private TransactionHistory saveHistory(TransactionHistory history) {
-        TransactionHistoryDao dao = BalancesheetDb.getInstance().getTransactionHistoryDao();;
+        TransactionHistoryDao dao = BalancesheetDb.getInstance().getTransactionHistoryDao();
         return dao.saveTransaction(history);
     }
 }

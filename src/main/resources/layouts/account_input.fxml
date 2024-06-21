@@ -6,20 +6,17 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 
-<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.AccountInputController">
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="rahulstech.jfx.balancesheet.controller.AccountInputController" hgap="10" vgap="10">
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-    <hgap>10</hgap> <!-- Horizontal gap between columns -->
-    <vgap>10</vgap> <!-- Vertical gap between rows -->
 
-    <children>
-        <Label text="Account Name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+    <Label text="Account Name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-        <Label text="Balance" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <TextField fx:id="balanceField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <Label text="Balance" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <TextField fx:id="balanceField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-        <Button text="Save" onAction="#handleSave" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-    </children>
+    <Button text="Save" onAction="#handleSave" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 </GridPane>

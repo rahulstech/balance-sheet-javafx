@@ -11,7 +11,7 @@
                 </VBox>
             </HBox>
             <HBox alignment="CENTER_RIGHT">
-                <HBox fx:id="actionPanel" spacing="10">
+                <HBox spacing="10">
                     <Button text="Select All" onAction="#handleSelectAll"/>
                     <Button text="Delete Selected" onAction="#handleDeleteHistory"/>
                     <Button text="Edit Selected" onAction="#handleEditHistory"/>

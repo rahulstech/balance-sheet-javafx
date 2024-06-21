@@ -14,14 +14,12 @@
     </HBox>
 
     <TabPane prefWidth="500" prefHeight="400" HBox.hgrow="ALWAYS">
-        <tabs>
-            <Tab closable="false" text="Accounts" fx:id="tabAccounts">
-            </Tab>
-            <Tab closable="false" text="People" fx:id="tabPeople">
-            </Tab>
-            <Tab closable="false" text="Misc" fx:id="tabMisc">
-            </Tab>
-        </tabs>
+        <Tab closable="false" text="Accounts" fx:id="tabAccounts">
+        </Tab>
+        <Tab closable="false" text="People" fx:id="tabPeople">
+        </Tab>
+        <Tab closable="false" text="Misc" fx:id="tabMisc">
+        </Tab>
     </TabPane>
 
 </VBox>

@@ -2,6 +2,7 @@ package rahulstech.jfx.balancesheet.json.model;
 
 import java.time.LocalDate;
 
+@SuppressWarnings("unused")
 public class Transaction {
     private long _id;
     private LocalDate date;

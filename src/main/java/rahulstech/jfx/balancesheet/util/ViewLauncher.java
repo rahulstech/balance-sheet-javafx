@@ -5,8 +5,15 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import rahulstech.jfx.balancesheet.ResourceLoader;
 import rahulstech.jfx.balancesheet.controller.Controller;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+@SuppressWarnings({"FieldMayBeFinal","unused"})
 public class ViewLauncher {
 
     private Stage ownerWindow;
@@ -22,6 +29,7 @@ public class ViewLauncher {
     private ViewLoader viewLoader;
     private double height;
     private double width;
+    private Set<String> styleSheets;
 
     private ViewLauncher(Builder builder) {
         this.showInDifferentWindow = builder.showInDifferentWindow;
@@ -36,15 +44,12 @@ public class ViewLauncher {
         this.viewLoader = builder.viewLoader;
         this.height = builder.height;
         this.width = builder.width;
+        this.styleSheets = builder.styleSheets;
     }
 
     public ViewLauncher load() {
-        ViewLoader viewLoader;
-        if (this.viewLoader == null) {
+        if (viewLoader == null) {
             viewLoader = new ViewLoader();
-        }
-        else {
-            viewLoader = this.viewLoader;
         }
         viewLoader.setFxml(fxml);
         if (this.controller != null) {
@@ -56,12 +61,7 @@ public class ViewLauncher {
         Stage ownerWindow = this.ownerWindow;
         Stage window;
         if (showInDifferentWindow) {
-            if (null != this.window) {
-                window = this.window;
-            }
-            else {
-                window = new Stage();
-            }
+            window = Objects.requireNonNullElseGet(this.window, Stage::new);
         }
         else {
             window = ownerWindow;
@@ -94,15 +94,33 @@ public class ViewLauncher {
         }
         viewLoader.setWindow(window);
         viewLoader.setScene(scene);
+        copyStyleSheets(ownerWindow.getScene(),scene);
+        applyStyleSheets(styleSheets,scene);
 
         this.root = root;
         this.controller = controller;
         this.window = window;
         this.scene = scene;
-        this.viewLoader = viewLoader;
+
         return this;
     }
 
+    private void copyStyleSheets(Scene from, Scene to) {
+        if (from!=to) {
+            to.getStylesheets().addAll(from.getStylesheets());
+        }
+    }
+
+    private void applyStyleSheets(Set<String> styleSheets, Scene target) {
+        if (null==styleSheets || styleSheets.isEmpty()) {
+            return;
+        }
+        for (String styleSheet : styleSheets) {
+            target.getStylesheets().add(ResourceLoader.getCssFileExternalForm(styleSheet));
+        }
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
         private String title;
         private Stage ownerWindow;
@@ -116,6 +134,7 @@ public class ViewLauncher {
         private ViewLoader viewLoader;
         private double height = -1;
         private double width = -1;
+        private Set<String> styleSheets;
 
         public Builder setTitle(String title) {
             this.title = title;
@@ -177,6 +196,17 @@ public class ViewLauncher {
             return this;
         }
 
+        public Builder setStyleSheet(String... styleSheet) {
+            if (null==styleSheet || 0==styleSheet.length) {
+                return this;
+            }
+            if (null == styleSheets) {
+                styleSheets = new HashSet<>();
+            }
+            styleSheets.addAll(Arrays.asList(styleSheet));
+            return this;
+        }
+
         public ViewLauncher build() {
             return new ViewLauncher(this);
         }
@@ -230,6 +260,10 @@ public class ViewLauncher {
     @SuppressWarnings("unchecked")
     public <T extends Controller> T getController() {
         return (T) controller;
+    }
+
+    public Set<String> getStyleSheets() {
+        return styleSheets;
     }
 }
 

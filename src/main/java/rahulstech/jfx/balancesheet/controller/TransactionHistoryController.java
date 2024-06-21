@@ -147,7 +147,7 @@ public class TransactionHistoryController extends Controller {
                 setTransactionHistories(task.getValue());
             });
             task.setOnFailed(e-> task.getException().printStackTrace());
-            filterTask = BalancesheetApp.getAppExecutor().submit(task);
+            filterTask = getApp().getAppExecutor().submit(task);
         });
     }
 
@@ -164,7 +164,7 @@ public class TransactionHistoryController extends Controller {
                         transactionTable.getItems().removeAll(histories);
                     });
                     task.setOnFailed(e-> task.getException().printStackTrace());
-                    BalancesheetApp.getAppExecutor().submit(task);
+                    getApp().getAppExecutor().submit(task);
                 },
                 "No Cancel",null);
     }
@@ -233,8 +233,7 @@ public class TransactionHistoryController extends Controller {
     }
 
     private void setTransactionHistories(List<TransactionHistory> value) {
-        ObservableList<TransactionHistory> histories = null == value ? FXCollections.emptyObservableList()
-                : FXCollections.observableList(value);
+        ObservableList<TransactionHistory> histories = FXCollections.observableList(value);
         transactionTable.setItems(histories);
     }
 
@@ -251,6 +250,6 @@ public class TransactionHistoryController extends Controller {
             setTransactionHistories(task.getValue());
         });
         task.setOnFailed(e-> task.getException().printStackTrace());
-        BalancesheetApp.getAppExecutor().submit(task);
+        getApp().getAppExecutor().submit(task);
     }
 }

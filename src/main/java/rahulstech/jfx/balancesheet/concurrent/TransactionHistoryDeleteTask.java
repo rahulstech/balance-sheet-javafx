@@ -10,6 +10,7 @@ import rahulstech.jfx.balancesheet.database.type.TransactionType;
 
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class TransactionHistoryDeleteTask extends Task<Boolean> {
 
     private final List<TransactionHistory> histories;

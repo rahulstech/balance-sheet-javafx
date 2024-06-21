@@ -57,16 +57,13 @@ public class DashboardController extends Controller {
             lastUsedDirectory = selectedFile.getParentFile();
             handleImportJson(selectedFile);
         } else {
-            DialogUtil.alertError(BalancesheetApp.getAppWindow(),"Error","No JSON backup file selected");
+            DialogUtil.alertError(getWindow(),"Error","No JSON backup file selected");
         }
     }
 
     private void handleImportJson(File json) {
-        ExecutorService executor = BalancesheetApp.getAppExecutor();
-        Stage appWindow = BalancesheetApp.getAppWindow();
-
         // show the progress dialog
-        Stage dialog = DialogUtil.showIndeterminateProgressDialog(appWindow, "Message","Json import in progress please wait");
+        Stage dialog = DialogUtil.showIndeterminateProgressDialog(getWindow(), "Message","Json import in progress please wait");
         dialog.show();
 
         // create and set up the import task
@@ -83,7 +80,7 @@ public class DashboardController extends Controller {
             dialog.close();
             onImportComplete(false,null,exception);
         });
-        importTask = executor.submit(task);
+        importTask = getApp().getAppExecutor().submit(task);
 
         dialog.setOnCloseRequest(e->{
             // cancel the ongoing task
@@ -94,7 +91,6 @@ public class DashboardController extends Controller {
     }
 
     private void onImportComplete(boolean successful, DataModel result, Throwable exception) {
-        Stage appWindow = BalancesheetApp.getAppWindow();
         if (successful) {
             ImportPickerTabsController controller = new ImportPickerTabsController(result);
             ViewLauncher loader = getViewLauncherBuilder()
@@ -106,7 +102,7 @@ public class DashboardController extends Controller {
             loader.getWindow().show();
         }
         else {
-            DialogUtil.alertError(appWindow,"Error","json file is not imported");
+            DialogUtil.alertError(getWindow(),"Error","json file is not imported");
         }
     }
 
@@ -133,9 +129,8 @@ public class DashboardController extends Controller {
     }
 
     private void handleCharts() {
-        ViewLauncher loader = new ViewLauncher.Builder()
+        ViewLauncher loader = getViewLauncherBuilder()
                 .setTitle("Charts")
-                .setOwnerWindow(BalancesheetApp.getAppWindow())
                 .setFxml("chart_browser.fxml")
                 .build();
         loader.load();

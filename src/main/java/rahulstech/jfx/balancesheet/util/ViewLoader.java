@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.ResourceLoader;
 import rahulstech.jfx.balancesheet.controller.Controller;
 
+@SuppressWarnings("ALL")
 public class ViewLoader {
 
     private Stage window;

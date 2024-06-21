@@ -1,5 +1,6 @@
 package rahulstech.jfx.balancesheet.json.model;
 
+@SuppressWarnings("unused")
 public class Person {
     private Long _id;
     private String person_name;

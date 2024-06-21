@@ -1,0 +1,29 @@
+
+/* Base style for the Material Design button */
+.button {
+    -fx-background-color: primaryColor; /* Primary color */
+    -fx-text-fill: whiteColor; /* Text color */
+    -fx-background-radius: 8px; /* Rounded corners */
+    -fx-padding: 10px 20px; /* Padding */
+    -fx-font-size: 14px; /* Font size */
+    -fx-font-weight: bold; /* Font weight */
+    -fx-border-color: transparent; /* Border color */
+    -fx-border-width: 0; /* Border width */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4); /* Shadow */
+    -fx-cursor: hand; /* Pointer cursor on hover */
+}
+
+.button:hover {
+    -fx-background-color: primaryColorDark; /* Darker shade for hover state */
+}
+
+.button:pressed {
+    -fx-background-color: primaryColor; /* Primary color when pressed */
+    -fx-effect: none; /* Remove shadow when pressed */
+}
+
+/* Set text-fill color for any child inside the graphic of myButton */
+.button > .ikonli-font-icon {
+   -fx-icon-color: whiteColor;
+   -fx-icon-size: 20px;
+}

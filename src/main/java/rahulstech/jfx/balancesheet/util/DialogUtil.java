@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import rahulstech.jfx.balancesheet.controller.ProgressDialogController;
 
+@SuppressWarnings("SameParameterValue")
 public class DialogUtil {
 
     public static Stage showIndeterminateProgressDialog(Stage owner, String title, String message) {
@@ -23,10 +24,6 @@ public class DialogUtil {
         controller.setMessage(message);
         controller.setIndeterminate(true);
         return loader.getWindow();
-    }
-
-    public static void alertSuccess(Stage owner, String title, String message) {
-        showAlert(owner, Alert.AlertType.INFORMATION,title,message);
     }
 
     public static void alertError(Stage owner, String title, String message) {

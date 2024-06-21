@@ -89,7 +89,7 @@ public class MonthlyTypeChartController extends Controller {
         monthEndComboBox.setButtonCell(newComboBoxListCellForYearMonth());
 
         // Populate month start and month end combo-boxes with sample data
-        BalancesheetApp.getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
+        getApp().getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
             YearMonth[] result = task.getValue();
             YearMonth minMonth = result[0];
             YearMonth maxMonth = result[1];
@@ -135,7 +135,7 @@ public class MonthlyTypeChartController extends Controller {
         if (null != currentTask) {
             currentTask.cancel(true);
         }
-        currentTask = BalancesheetApp.getAppExecutor()
+        currentTask = getApp().getAppExecutor()
                 .submit(TaskUtils.getMonthlyTypeChartQueryTask(monthStart,monthEnd,type,
                         task->prepareChartData(type,task.getValue()),
                         task -> {

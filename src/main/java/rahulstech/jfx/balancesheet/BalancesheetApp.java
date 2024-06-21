@@ -5,25 +5,35 @@ import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@SuppressWarnings("ALL")
 public class BalancesheetApp extends Application {
 
-    private static ExecutorService executor;
+    private static BalancesheetApp INSTANCE;
 
-    private static Stage appWindow;
+    private ExecutorService executor;
 
-    public static ExecutorService getAppExecutor() {
+    private Stage appWindow;
+
+    public ExecutorService getAppExecutor() {
         if (null == executor) {
             executor = Executors.newCachedThreadPool();
         }
         return executor;
     }
 
-    public static Stage getAppWindow() {
+    public Stage getAppWindow() {
         return appWindow;
+    }
+
+    public BalancesheetApp() {
+        INSTANCE = this;
+    }
+
+    public static BalancesheetApp getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -33,26 +43,18 @@ public class BalancesheetApp extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
         appWindow = stage;
         ViewLauncher viewLauncher = new ViewLauncher.Builder()
                 .setOwnerWindow(stage)
                 .setTitle("Balance Sheet")
                 .setFxml("dashboard.fxml")
-                .setHeight(400)
-                .setWidth(600)
                 .setShowInDifferentWindow(false)
+                .setStyleSheet("theme.css","colors.css")
                 .build();
         viewLauncher.load();
+        viewLauncher.getWindow().setMaximized(true);
         viewLauncher.getWindow().show();
-
-        /*ViewLauncher viewLauncher = new ViewLauncher.Builder()
-                .setOwnerWindow(stage)
-                .setFxml("monthly_category_chart.fxml")
-                .setShowInDifferentWindow(false)
-                .build();
-        viewLauncher.load();
-        viewLauncher.getWindow().show();*/
     }
 
     @Override

@@ -2,6 +2,7 @@ package rahulstech.jfx.balancesheet.json.model;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class DataModel {
     private List<Account> accounts;
     private List<Person> people;

@@ -2,6 +2,7 @@ package rahulstech.jfx.balancesheet.json.model;
 
 import java.time.LocalDate;
 
+@SuppressWarnings("unused")
 public class MoneyTransfer {
     private String amount;
     private String description;

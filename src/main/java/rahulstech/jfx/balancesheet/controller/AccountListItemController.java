@@ -4,7 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 
-public class AccountListItemController {
+public class AccountListItemController extends Controller {
 
     @FXML
     private Label nameLabel;

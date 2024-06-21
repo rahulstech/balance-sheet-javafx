@@ -21,16 +21,6 @@ public class JsonHelper {
         }
     }
 
-    public static DataModel parseJsonString(String json) {
-        Gson gson = createGson();
-        try {
-            return gson.fromJson(json, DataModel.class);
-        }
-        catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     private static Gson createGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>)

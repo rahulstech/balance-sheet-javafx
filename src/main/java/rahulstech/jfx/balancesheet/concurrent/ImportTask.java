@@ -6,6 +6,7 @@ import rahulstech.jfx.balancesheet.json.model.DataModel;
 
 import java.io.File;
 
+@SuppressWarnings("ALL")
 public class ImportTask extends Task<DataModel> {
 
     private final File jsonFile;

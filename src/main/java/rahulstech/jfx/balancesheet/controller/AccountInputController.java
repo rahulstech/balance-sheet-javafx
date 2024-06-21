@@ -94,6 +94,6 @@ public class AccountInputController extends Controller {
             dialog.close();
             DialogUtil.alertError(getWindow(),"Save Error","Account not saved");
         });
-        BalancesheetApp.getAppExecutor().submit(task);
+        getApp().getAppExecutor().submit(task);
     }
 }

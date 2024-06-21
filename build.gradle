@@ -39,7 +39,10 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
     implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'de.jensd:fontawesomefx:8.9'
+
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
+
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign-pack:12.3.1'
 
     // ORMLite core library
     implementation 'com.j256.ormlite:ormlite-core:5.6'

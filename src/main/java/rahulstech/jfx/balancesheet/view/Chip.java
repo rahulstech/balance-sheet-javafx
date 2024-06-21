@@ -9,7 +9,9 @@ import rahulstech.jfx.balancesheet.ResourceLoader;
 
 public class Chip extends HBox {
 
+    @SuppressWarnings("FieldMayBeFinal")
     private Label label;
+    @SuppressWarnings("FieldMayBeFinal")
     private Button closeButton;
     private ChipCloseListener closeListener;
 
@@ -42,6 +44,7 @@ public class Chip extends HBox {
         return label;
     }
 
+    @SuppressWarnings("unused")
     public Button getCloseButton() {
         return closeButton;
     }

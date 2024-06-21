@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 public class InsertTask extends Task<Boolean> {
 
     public static class FilterData {

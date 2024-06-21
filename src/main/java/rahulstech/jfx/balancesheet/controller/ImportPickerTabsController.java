@@ -85,7 +85,7 @@ public class ImportPickerTabsController extends Controller {
         filterData.importDebitTransactions = importOptions.contains(ImportMiscTabController.ImportOptions.Debit);
         filterData.importTransfers = importOptions.contains(ImportMiscTabController.ImportOptions.Transfers);
 
-        ExecutorService executor = BalancesheetApp.getAppExecutor();
+        ExecutorService executor = getApp().getAppExecutor();
         InsertTask task = new InsertTask(model,filterData);
         task.setOnSucceeded(e->{
             stage.close();
