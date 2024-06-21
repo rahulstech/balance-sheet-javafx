@@ -9,10 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.TransactionHistorySaveTask;
-import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
@@ -29,6 +26,7 @@ import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class InputTransactionHistoryController extends Controller {
 
     private static final int MAX_CATEGORIES = 5;

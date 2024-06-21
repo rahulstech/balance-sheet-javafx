@@ -11,6 +11,7 @@ import rahulstech.jfx.balancesheet.util.ViewLoader;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("ALL")
 public class Controller implements Initializable {
 
     private Stage window;

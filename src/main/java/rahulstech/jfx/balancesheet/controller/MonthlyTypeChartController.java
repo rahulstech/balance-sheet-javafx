@@ -3,12 +3,14 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.*;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxListCell;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.model.MonthlyTypeModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 
+@SuppressWarnings("ALL")
 public class MonthlyTypeChartController extends Controller {
 
     private final DateTimeFormatter YEAR_MONTH_FORMAT_CHART = DateTimeFormatter.ofPattern("MMM-yy");

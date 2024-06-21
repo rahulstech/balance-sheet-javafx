@@ -10,6 +10,7 @@ import rahulstech.jfx.balancesheet.util.ViewLoader;
 
 import java.util.ResourceBundle;
 
+@SuppressWarnings("ALL")
 public class ChartBrowserController extends Controller {
 
     private ObservableList<String> CHARTS = FXCollections.observableArrayList(

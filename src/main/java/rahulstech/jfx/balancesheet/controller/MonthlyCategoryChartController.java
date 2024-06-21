@@ -14,7 +14,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxListCell;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
@@ -30,6 +29,7 @@ import java.util.concurrent.Future;
 
 import static rahulstech.jfx.balancesheet.concurrent.TaskUtils.createTask;
 
+@SuppressWarnings("ALL")
 public class MonthlyCategoryChartController extends Controller {
 
     private final DateTimeFormatter YEAR_MONTH_FORMAT_CHART = DateTimeFormatter.ofPattern("MMM-yy");

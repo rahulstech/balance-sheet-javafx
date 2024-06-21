@@ -8,6 +8,7 @@ import rahulstech.jfx.balancesheet.database.type.TransactionType;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("ALL")
 public class HistoryFilterMiscController extends Controller {
     public enum OrderBy {
         AMOUNT_ASC("Amount Ascending"),

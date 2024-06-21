@@ -11,7 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.TransactionHistoryDeleteTask;
 import rahulstech.jfx.balancesheet.concurrent.TransactionHistoryFilterTask;
 import rahulstech.jfx.balancesheet.database.dao.HistoryFilterData;
@@ -28,6 +27,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 public class TransactionHistoryController extends Controller {
 
     private static final DateTimeFormatter WHEN_FORMATER = DateTimeFormatter.ofPattern("MMMM dd, yyyy");

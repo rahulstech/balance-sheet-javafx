@@ -6,7 +6,6 @@ import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.ImportTask;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
@@ -15,9 +14,9 @@ import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
 import java.io.File;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+@SuppressWarnings("ALL")
 public class DashboardController extends Controller {
 
     @FXML

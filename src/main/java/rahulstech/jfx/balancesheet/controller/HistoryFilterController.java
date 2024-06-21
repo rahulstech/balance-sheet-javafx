@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("ALL")
 public class HistoryFilterController extends Controller {
 
     @FXML

@@ -3,7 +3,6 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.stage.Stage;
-import rahulstech.jfx.balancesheet.BalancesheetApp;
 import rahulstech.jfx.balancesheet.concurrent.InsertTask;
 import rahulstech.jfx.balancesheet.json.model.Account;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
@@ -16,6 +15,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+@SuppressWarnings("ALL")
 public class ImportPickerTabsController extends Controller {
 
     @FXML

@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+@SuppressWarnings("ALL")
 public class AccountsListController extends Controller {
 
     @FXML

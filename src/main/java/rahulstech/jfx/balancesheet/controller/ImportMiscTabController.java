@@ -9,10 +9,10 @@ import rahulstech.jfx.balancesheet.view.Chip;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+@SuppressWarnings("ALL")
 public class ImportMiscTabController extends Controller {
 
     public static enum ImportOptions {
