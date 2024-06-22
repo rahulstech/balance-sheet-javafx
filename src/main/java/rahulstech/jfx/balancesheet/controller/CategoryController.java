@@ -106,7 +106,13 @@ public class CategoryController extends Controller {
             Task<Category> createTask = TaskUtils.saveCategory(newCategory,
                     task -> {
                 Category category = task.getValue();
-                categoryList.getItems().add(category);
+                int index = categoryList.getItems().indexOf(category);
+                if (index>=0) {
+                    categoryList.getItems().set(index,category);
+                }
+                else {
+                    categoryList.getItems().add(category);
+                }
                     },
                     task -> {
                         task.getException().printStackTrace();

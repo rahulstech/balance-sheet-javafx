@@ -27,6 +27,7 @@
             <columns>
                 <TableColumn fx:id="dateColumn" text="Date" prefWidth="160"/>
                 <TableColumn fx:id="amountColumn" text="Amount" prefWidth="160"/>
+                <TableColumn fx:id="taxColumn" text="Tax" prefWidth="160"/>
                 <TableColumn fx:id="srcColumn" text="Source" prefWidth="140"/>
                 <TableColumn fx:id="destColumn" text="Destination" prefWidth="140"/>
                 <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>

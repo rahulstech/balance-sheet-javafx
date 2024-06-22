@@ -12,6 +12,8 @@
 
 <?import javafx.scene.control.ScrollPane?>
 <GridPane
+        prefWidth="800"
+        prefHeight="500"
         style="-fx-padding: 16px"
         xmlns:fx="http://javafx.com/fxml"
         fx:controller="rahulstech.jfx.balancesheet.controller.InputTransactionHistoryController" hgap="10" vgap="10">
@@ -22,34 +24,37 @@
     <Label text="Amount:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
     <TextField fx:id="amountField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-    <Label text="Source Account:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-    <HBox GridPane.rowIndex="2" GridPane.columnIndex="1" spacing="5">
+    <Label text="Tax:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <TextField fx:id="taxField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+    <Label text="Source Account:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" spacing="5">
         <TextField fx:id="srcAccountField" disable="true" HBox.hgrow="ALWAYS"/>
         <Button text="Select" fx:id="buttonAddSrcAccount" onAction="#handleSelectSrcAccount"/>
     </HBox>
 
-    <Label text="Destination Account:" fx:id="destAccountLabel" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-    <HBox fx:id="paneDestAccount" GridPane.rowIndex="3" GridPane.columnIndex="1" spacing="5" alignment="CENTER">
+    <Label text="Destination Account:" fx:id="destAccountLabel" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+    <HBox fx:id="paneDestAccount" GridPane.rowIndex="4" GridPane.columnIndex="1" spacing="5" alignment="CENTER">
         <TextField fx:id="destAccountField" disable="true" HBox.hgrow="ALWAYS"/>
         <Button text="Select" fx:id="buttonAddDestAccount" onAction="#handleSelectDestAccount"/>
     </HBox>
 
-    <Label text="Transaction Type:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-    <ComboBox fx:id="transactionTypeCombo" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    <Label text="Transaction Type:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+    <ComboBox fx:id="transactionTypeCombo" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-    <Label text="Description:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-    <TextArea fx:id="descriptionField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+    <Label text="Description:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+    <TextArea fx:id="descriptionField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-    <Label text="Categories:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+    <Label text="Categories:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
     <HBox prefHeight="100" GridPane.vgrow="ALWAYS" GridPane.valignment="CENTER"
           spacing="10"
-          GridPane.rowIndex="6" GridPane.columnIndex="1">
+          GridPane.rowIndex="7" GridPane.columnIndex="1">
         <ScrollPane maxHeight="80" HBox.hgrow="NEVER"
                     fitToWidth="true" hbarPolicy="NEVER">
             <FlowPane style="-fx-padding: 12;" fx:id="categoriesFlowPane" hgap="10" vgap="10" />
         </ScrollPane>
         <Button text="Add Category" HBox.hgrow="NEVER" onAction="#handleAddCategoryAction"/>
     </HBox>
-    <Button GridPane.rowIndex="7"
-            GridPane.columnIndex="1"  text="Save" onAction="#handleSaveAction"/>
+    <Button GridPane.rowIndex="8" GridPane.columnIndex="1"
+            text="Save" onAction="#handleSaveAction"/>
 </GridPane>

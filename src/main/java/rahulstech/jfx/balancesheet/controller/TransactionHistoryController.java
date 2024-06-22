@@ -48,6 +48,9 @@ public class TransactionHistoryController extends Controller {
     private TableColumn<TransactionHistory, Text> amountColumn;
 
     @FXML
+    private TableColumn<TransactionHistory,String> taxColumn;
+
+    @FXML
     private TableColumn<TransactionHistory, String> srcColumn;
 
     @FXML
@@ -83,6 +86,12 @@ public class TransactionHistoryController extends Controller {
                 text.setFill(Color.web("#00B4D8"));
             }
             return new SimpleObjectProperty<>(text);
+        });
+
+        taxColumn.setCellValueFactory(cellData -> {
+            TransactionHistory transaction = cellData.getValue();
+            String tax = null==transaction.getTax() ? null : transaction.getTax().toString();
+            return new SimpleStringProperty(tax);
         });
 
         srcColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
@@ -182,8 +191,6 @@ public class TransactionHistoryController extends Controller {
                 .setTitle("Edit History")
                 .setFxml("input_transaction_history.fxml")
                 .setStageModality(Modality.APPLICATION_MODAL)
-                .setHeight(500)
-                .setWidth(750)
                 .build().load();
         InputTransactionHistoryController controller = launcher.getController();
         controller.getWindow().show();
@@ -226,8 +233,6 @@ public class TransactionHistoryController extends Controller {
         ViewLauncher launcher = getViewLauncherBuilder().setFxml("input_transaction_history.fxml")
                 .setTitle("Add New History")
                 .setStageModality(Modality.APPLICATION_MODAL)
-                .setHeight(500)
-                .setWidth(750)
                 .build().load();
         launcher.getWindow().show();
     }

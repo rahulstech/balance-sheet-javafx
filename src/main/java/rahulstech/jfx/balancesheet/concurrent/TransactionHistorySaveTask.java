@@ -28,7 +28,9 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
             TransactionHistory saved = saveHistory(this.history);
             TransactionType type = saved.getType();
             Currency changeForSrcAccount = calculateAmountChangeForSrcAccount(old,saved);
-            updateAccountBalance(saved.getSrc(),changeForSrcAccount);
+            Currency taxChangeForSrcAccount = calculateTaxChangeForSrcAccount(old,saved);
+            Currency srcBalanceChange = changeForSrcAccount.add(taxChangeForSrcAccount.negate());
+            updateAccountBalance(saved.getSrc(),srcBalanceChange);
             if (type == TransactionType.TRANSFER) {
                 Currency changeForDestAccount = changeForSrcAccount.negate();
                 updateAccountBalance(saved.getDest(),changeForDestAccount);
@@ -63,6 +65,15 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
         else {
             return old_amount.subtract(new_amount);
         }
+    }
+
+    private Currency calculateTaxChangeForSrcAccount(TransactionHistory oldV, TransactionHistory newV) {
+        Currency new_tax = null==newV.getTax() ? Currency.ZERO : newV.getTax();
+        if (null==oldV) {
+            return new_tax;
+        }
+        Currency old_tax = null==oldV.getTax() ? Currency.ZERO : oldV.getTax();
+        return new_tax.subtract(old_tax);
     }
 
     private TransactionHistory saveHistory(TransactionHistory history) {

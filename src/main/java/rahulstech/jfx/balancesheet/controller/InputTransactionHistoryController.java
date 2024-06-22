@@ -53,6 +53,9 @@ public class InputTransactionHistoryController extends Controller {
     private TextField amountField;
 
     @FXML
+    private TextField taxField;
+
+    @FXML
     private ComboBox<TransactionType> transactionTypeCombo;
 
     @FXML
@@ -81,6 +84,9 @@ public class InputTransactionHistoryController extends Controller {
         setDestAccount(oldHistory.getDest());
         descriptionField.setText(oldHistory.getDescription());
         addCategories(oldHistory.getCategories());
+        if (null!=oldHistory.getTax()) {
+            taxField.setText(oldHistory.getTax().toString());
+        }
 
         buttonAddSrcAccount.setDisable(true);
         buttonAddDestAccount.setDisable(true);
@@ -137,15 +143,18 @@ public class InputTransactionHistoryController extends Controller {
             }
         };
 
-        TextFormatter<Currency> textFormatter = new TextFormatter<>(converter, null, filter);
+        TextFormatter<Currency> amountTextFormatter = new TextFormatter<>(converter, null, filter);
+        TextFormatter<Currency> taxTextFormatter = new TextFormatter<>(converter,null,filter);
 
-        amountField.setTextFormatter(textFormatter);
+        amountField.setTextFormatter(amountTextFormatter);
+        taxField.setTextFormatter(taxTextFormatter);
     }
 
     @FXML
     private void handleSaveAction() {
         LocalDate date = datePicker.getValue();
-        Currency amount = Currency.from(amountField.getText());
+        Currency amount = (Currency) amountField.getTextFormatter().getValue();
+        Currency tax = (Currency) taxField.getTextFormatter().getValue();
         Account srcAccount = (Account) srcAccountField.getUserData();
         Account destAccount = (Account) destAccountField.getUserData();
         TransactionType transactionType = transactionTypeCombo.getValue();
@@ -167,6 +176,7 @@ public class InputTransactionHistoryController extends Controller {
             transactionHistory.setType(transactionType);
             transactionHistory.setDescription(description);
             transactionHistory.setCategories(categories);
+            transactionHistory.setTax(tax);
             saveHistory(transactionHistory);
         } else {
             DialogUtil.alertError(getWindow(),"Error","Some inputs contain error.");

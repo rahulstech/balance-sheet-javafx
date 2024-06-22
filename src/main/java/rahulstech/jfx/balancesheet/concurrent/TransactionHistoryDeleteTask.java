@@ -36,7 +36,9 @@ public class TransactionHistoryDeleteTask extends Task<Boolean> {
             return;
         }
         Currency changeForSrcAccount = calculateAmountChangeForSrcAccount(history);
-        updateAccountBalance(history.getSrc(),changeForSrcAccount);
+        Currency taxChangeForSrcAccount = calculateTaxChangeForSrcAccount(history);
+        Currency balanceChangeForSrcAccount = changeForSrcAccount.add(taxChangeForSrcAccount);
+        updateAccountBalance(history.getSrc(),balanceChangeForSrcAccount);
         if (type == TransactionType.TRANSFER) {
             Currency changeForDestAccount = changeForSrcAccount.negate();
             updateAccountBalance(history.getDest(),changeForDestAccount);
@@ -60,6 +62,10 @@ public class TransactionHistoryDeleteTask extends Task<Boolean> {
         else {
             return amount;
         }
+    }
+
+    private Currency calculateTaxChangeForSrcAccount(TransactionHistory history) {
+        return null==history.getTax() ? Currency.ZERO : history.getTax();
     }
 }
 
