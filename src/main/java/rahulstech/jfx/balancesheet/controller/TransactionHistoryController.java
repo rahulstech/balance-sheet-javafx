@@ -18,6 +18,7 @@ import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("ALL")
 public class TransactionHistoryController extends Controller {
+
+    private static final String TAG = TransactionHistoryController.class.getSimpleName();
 
     private static final DateTimeFormatter WHEN_FORMATER = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
 
@@ -155,7 +158,7 @@ public class TransactionHistoryController extends Controller {
             task.setOnSucceeded(event -> {
                 setTransactionHistories(task.getValue());
             });
-            task.setOnFailed(e-> task.getException().printStackTrace());
+            task.setOnFailed(e-> Log.error(TAG,"filter-task",task.getException()));
             filterTask = getApp().getAppExecutor().submit(task);
         });
     }
@@ -254,7 +257,7 @@ public class TransactionHistoryController extends Controller {
             this.histories = task.getValue();
             setTransactionHistories(task.getValue());
         });
-        task.setOnFailed(e-> task.getException().printStackTrace());
+        task.setOnFailed(e-> Log.error(TAG,"loadHistories",task.getException()));
         getApp().getAppExecutor().submit(task);
     }
 }

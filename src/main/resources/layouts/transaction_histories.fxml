@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.TransactionHistoryController">
     <top>
         <HBox spacing="10" alignment="CENTER" style="-fx-padding: 12px 16px;">
@@ -12,12 +13,36 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT">
                 <HBox spacing="10">
-                    <Button text="Select All" onAction="#handleSelectAll"/>
-                    <Button text="Delete Selected" onAction="#handleDeleteHistory"/>
-                    <Button text="Edit Selected" onAction="#handleEditHistory"/>
-                    <Button text="Refresh" onAction="#handleRefresh"/>
-                    <Button text="Filter" onAction="#handleFilter"/>
-                    <Button text="Add History" onAction="#handleAddHistory"/>
+                    <Button text="Select All" onAction="#handleSelectAll">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-select-all"/>
+                        </graphic>
+                    </Button>
+                    <Button text="Delete Selected" onAction="#handleDeleteHistory">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-delete"/>
+                        </graphic>
+                    </Button>
+                    <Button text="Edit Selected" onAction="#handleEditHistory">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-pencil"/>
+                        </graphic>
+                    </Button>
+                    <Button text="Filter" onAction="#handleFilter">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-filter"/>
+                        </graphic>
+                    </Button>
+                    <Button text="Refresh" onAction="#handleRefresh">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-refresh"/>
+                        </graphic>
+                    </Button>
+                    <Button text="Add History" onAction="#handleAddHistory">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-plus"/>
+                        </graphic>
+                    </Button>
                 </HBox>
             </HBox>
         </HBox>

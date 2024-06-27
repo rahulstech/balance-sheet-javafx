@@ -19,6 +19,7 @@ import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.view.Chip;
 
@@ -26,11 +27,14 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static rahulstech.jfx.balancesheet.concurrent.TaskUtils.createTask;
 
 @SuppressWarnings("ALL")
 public class MonthlyCategoryChartController extends Controller {
+
+    private static final String TAG = MonthlyCategoryChartController.class.getSimpleName();
 
     private final DateTimeFormatter YEAR_MONTH_FORMAT_CHART = DateTimeFormatter.ofPattern("MMM-yy");
 
@@ -133,7 +137,7 @@ public class MonthlyCategoryChartController extends Controller {
                 Tooltip avgTooltip = new Tooltip(average.toString());
                 Tooltip.install(avgDataPoint.getNode(), avgTooltip);
             }
-        },t->t.getException().printStackTrace());
+        },t-> Log.error(TAG,"monthly category chart data task",t.getException()));
         getApp().getAppExecutor().submit(task);
     }
 
@@ -177,7 +181,7 @@ public class MonthlyCategoryChartController extends Controller {
         }
         YearMonth startMonth = startMonthComboBox.getValue();
         YearMonth endMonth = endMonthComboBox.getValue();
-        List<Category> categories = selectedCategories.stream().toList();
+        List<Category> categories = selectedCategories.stream().collect(Collectors.toList());
         if (categories.isEmpty()) {
             DialogUtil.alertError(getWindow(),"Chart Error","Choose at least one category to create chart");
             return;
@@ -188,7 +192,7 @@ public class MonthlyCategoryChartController extends Controller {
         }
         Task<List<MonthlyCategoryModel>> task = TaskUtils.getMonthlyCategoroyChartQueryTask(startMonth,endMonth,categories,
                 t-> setMonthlyCategoryData(t.getValue()),
-                t->t.getException().printStackTrace());
+                t->Log.error(TAG,"monthly category chart data query task",t.getException()));
         chartDataTask = getApp().getAppExecutor().submit(task);
     }
 
@@ -201,6 +205,9 @@ public class MonthlyCategoryChartController extends Controller {
         // Populate month start and month end combo-boxes with sample data
         getApp().getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
                     YearMonth[] result = task.getValue();
+                    if (null==result) {
+                        return;
+                    }
                     YearMonth minMonth = result[0];
                     YearMonth maxMonth = result[1];
                     List<YearMonth> months = new ArrayList<>();
@@ -213,7 +220,7 @@ public class MonthlyCategoryChartController extends Controller {
                     startMonthComboBox.getSelectionModel().selectFirst();
                     endMonthComboBox.getSelectionModel().selectFirst();
                 },
-                task -> task.getException().printStackTrace()));
+                task -> Log.error(TAG,"get min max month task",task.getException())));
     }
 
     private ComboBoxListCell<YearMonth> newComboBoxListCellForYearMonth() {

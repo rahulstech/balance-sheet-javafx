@@ -16,6 +16,7 @@ import rahulstech.jfx.balancesheet.database.model.MonthlyTypeModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +28,10 @@ import java.util.concurrent.Future;
 @SuppressWarnings("ALL")
 public class MonthlyTypeChartController extends Controller {
 
+    private static final String TAG = MonthlyTypeChartController.class.getSimpleName();
+
     private final DateTimeFormatter YEAR_MONTH_FORMAT_CHART = DateTimeFormatter.ofPattern("MMM-yy");
+
     private final DateTimeFormatter YEAR_MONTH_FORMAT_DROPDOWN = DateTimeFormatter.ofPattern("MMMM-yyyy");
 
     @FXML
@@ -59,7 +63,7 @@ public class MonthlyTypeChartController extends Controller {
     protected void onInitialize(ResourceBundle resources) {
         prepareChart();
         // Populate the dropdowns
-        populateComboBoxes();
+        prepareComboboxs();
         // Set event handler for create chart button
         createChartButton.setOnAction(event -> createChart());
     }
@@ -85,7 +89,7 @@ public class MonthlyTypeChartController extends Controller {
         };
     }
 
-    private void populateComboBoxes() {
+    private void prepareComboboxs() {
         monthStartComboBox.setCellFactory(yearMonthListView -> newComboBoxListCellForYearMonth());
         monthStartComboBox.setButtonCell(newComboBoxListCellForYearMonth());
         monthEndComboBox.setCellFactory(yearMonthListView -> newComboBoxListCellForYearMonth());
@@ -94,23 +98,30 @@ public class MonthlyTypeChartController extends Controller {
         // Populate month start and month end combo-boxes with sample data
         getApp().getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
             YearMonth[] result = task.getValue();
+            if (null==result) {
+                return;
+            }
             YearMonth minMonth = result[0];
             YearMonth maxMonth = result[1];
-            List<YearMonth> months = new ArrayList<>();
-            // Loop from start to end and add each YearMonth to the list
-            for (YearMonth yearMonth = minMonth; !yearMonth.isAfter(maxMonth); yearMonth = yearMonth.plusMonths(1)) {
-                months.add(yearMonth);
-            }
-            monthStartComboBox.setItems(FXCollections.observableArrayList(months));
-            monthEndComboBox.setItems(FXCollections.observableArrayList(months));
-            monthStartComboBox.getSelectionModel().selectFirst();
-            monthEndComboBox.getSelectionModel().selectFirst();
+            setComboBoxItems(minMonth,maxMonth);
         },
-                task -> System.err.println(task.getException())));
+                task -> Log.error(TAG,"min max months",task.getException())));
 
         // Populate transaction type combo-box
         transactionTypeComboBox.setItems(FXCollections.observableArrayList(TransactionType.values()));
         transactionTypeComboBox.getSelectionModel().selectFirst();
+    }
+
+    private void setComboBoxItems(YearMonth minMonth, YearMonth maxMonth) {
+        List<YearMonth> months = new ArrayList<>();
+        // Loop from start to end and add each YearMonth to the list
+        for (YearMonth yearMonth = minMonth; !yearMonth.isAfter(maxMonth); yearMonth = yearMonth.plusMonths(1)) {
+            months.add(yearMonth);
+        }
+        monthStartComboBox.setItems(FXCollections.observableArrayList(months));
+        monthEndComboBox.setItems(FXCollections.observableArrayList(months));
+        monthStartComboBox.getSelectionModel().selectFirst();
+        monthEndComboBox.getSelectionModel().selectFirst();
     }
 
     private void createChart() {
@@ -142,7 +153,7 @@ public class MonthlyTypeChartController extends Controller {
                 .submit(TaskUtils.getMonthlyTypeChartQueryTask(monthStart,monthEnd,type,
                         task->prepareChartData(type,task.getValue()),
                         task -> {
-                            System.err.println(task.getException());
+                            Log.error(TAG,"filterData",task.getException());
                             showAlert("Error!","Unable to fetch chart data. Please try again");
                         }));
     }

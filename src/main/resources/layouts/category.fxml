@@ -3,12 +3,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.CategoryController" spacing="10">
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<VBox prefWidth="620"
+        xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.CategoryController" spacing="10">
     <HBox spacing="10" style="-fx-padding: 12px 10px">
         <Label text="Name:"/>
         <TextField fx:id="nameField" prefWidth="220" />
-        <Button text="Add Category" onAction="#handleAddCategory"/>
-        <Button text="Refresh" onAction="#handleRefresh"/>
+        <Button text="Add Category" onAction="#handleAddCategory">
+            <graphic>
+                <FontIcon iconLiteral="mdi-plus"/>
+            </graphic>
+        </Button>
+        <Button text="Refresh" onAction="#handleRefresh">
+            <graphic>
+                <FontIcon iconLiteral="mdi-refresh"/>
+            </graphic>
+        </Button>
     </HBox>
     <ListView fx:id="categoryList"/>
 </VBox>

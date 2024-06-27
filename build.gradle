@@ -17,14 +17,21 @@ ext {
     junitVersion = '5.10.0'
 }
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_9
+    targetCompatibility = JavaVersion.VERSION_1_9
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.addAll(Arrays.asList("--release","9"))
+}
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
 application {
+    mainModule = 'rahulstech.jfx.balancesheet'
     mainClass = 'rahulstech.jfx.balancesheet.BalancesheetApp'
 }
 
@@ -38,10 +45,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
+    // google gson
     implementation 'com.google.code.gson:gson:2.8.9'
 
+    // ikonli font icons
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
 
+    // ikonli material icon packs
     implementation 'org.kordamp.ikonli:ikonli-materialdesign-pack:12.3.1'
 
     // ORMLite core library
@@ -51,7 +61,12 @@ dependencies {
     implementation 'com.j256.ormlite:ormlite-jdbc:5.6'
 
     // SQLite JDBC driver
-    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+    implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
+
+    // slef4j logging
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+
+    implementation 'ch.qos.logback:logback-classic:1.4.12'
 }
 
 test {
@@ -62,7 +77,20 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'app'
+        name = 'balancesheet'
+    }
+    jpackage {
+        imageOptions = [
+                '--icon', './app_icon.png', // Path to your icon
+                '--app-version', '1.0.0', // Application version
+                '--vendor', 'Rahul\'s Tech', // Vendor name
+        ]
+        installerOptions = [
+                '--linux-package-name','rahulstech.jfx.balancesheet', // linux package name
+                '--linux-deb-maintainer', 'rahulstech18@gmail.com', // email only
+                '--linux-app-category','Utility'
+        ]
+        installerType = 'deb' // Change to 'rpm' if needed
     }
 }
 

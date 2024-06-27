@@ -1,5 +1,7 @@
 package rahulstech.jfx.balancesheet.controller;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,41 +16,53 @@ import java.util.ResourceBundle;
 @SuppressWarnings("ALL")
 public class Controller implements Initializable {
 
-    private Stage window;
+    private ObjectProperty<Stage> windowProperty = new SimpleObjectProperty<>();
 
-    private Scene scene;
+    private ObjectProperty<Scene> sceneProperty = new SimpleObjectProperty<>();
+
+    private ObjectProperty<Parent> rootProperty = new SimpleObjectProperty<>();
+
+    private ResourceBundle resource;
+
+    public ObjectProperty<Parent> rootProperty() {
+        return rootProperty;
+    }
 
     public Parent getRoot() {
-        return root;
+        return rootProperty.getValue();
     }
 
     public void setRoot(Parent root) {
-        this.root = root;
+        rootProperty.setValue(root);
+    }
+
+    public ObjectProperty<Stage> stageProperty() {
+        return windowProperty;
     }
 
     public Stage getWindow() {
-        return window;
+        return windowProperty.getValue();
     }
 
     public void setWindow(Stage window) {
-        this.window = window;
+        windowProperty.setValue(window);
+    }
+
+    public ObjectProperty<Scene> sceneProperty() {
+        return sceneProperty;
     }
 
     public Scene getScene() {
-        return scene;
+        return sceneProperty.getValue();
     }
 
     public void setScene(Scene scene) {
-        this.scene = scene;
+        sceneProperty.setValue(scene);
     }
 
     public ResourceBundle getResource() {
         return resource;
     }
-
-    private Parent root;
-
-    private ResourceBundle resource;
 
     @Override
     public final void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,8 +72,8 @@ public class Controller implements Initializable {
 
     public ViewLoader getViewLoader() {
         ViewLoader loader = new ViewLoader();
-        loader.setWindow(window);
-        loader.setScene(scene);
+        loader.setWindow(getWindow());
+        loader.setScene(getScene());
         return loader;
     }
 

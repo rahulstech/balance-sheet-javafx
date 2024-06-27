@@ -8,9 +8,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.util.Callback;
+import org.kordamp.ikonli.javafx.FontIcon;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.util.ViewLoader;
 
@@ -22,6 +24,8 @@ import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
 public class AccountsListController extends Controller {
+
+    private static final String TAG = AccountsListController.class.getSimpleName();
 
     @FXML
     private TextField searchField;
@@ -63,7 +67,7 @@ public class AccountsListController extends Controller {
             }
             ExecutorService executor = getApp().getAppExecutor();
             Task<List<Account>> task = TaskUtils.filterAccount(accounts, newValue, t-> setAccounts(t.getValue()),
-                    t-> t.getException().printStackTrace());
+                    t-> Log.error(TAG,"filter account",t.getException()));
             currentTask = executor.submit(task);  // Submit the new task
         });
         loadAccounts();
@@ -77,9 +81,11 @@ public class AccountsListController extends Controller {
         ContextMenu menu = new ContextMenu();
 
         MenuItem edit = new MenuItem("Edit");
+        edit.setGraphic(new FontIcon("mdi-pencil"));
         edit.setOnAction(e->handleEditAccount(account));
 
         MenuItem delete = new MenuItem("Delete");
+        delete.setGraphic(new FontIcon("mdi-delete"));
         delete.setOnAction(e->handleDeleteAccount(account));
 
         menu.getItems().addAll(edit,delete);
@@ -105,7 +111,7 @@ public class AccountsListController extends Controller {
                 "Delete",()->{
                     Task<Boolean> task = TaskUtils.deleteAccount(Collections.singletonList(account),
                             t-> accountListView.getItems().remove(account), t->{
-                        t.getException().printStackTrace();
+                        Log.error(TAG,"delete accounts",t.getException());
                         DialogUtil.alertError(getWindow(),"Error","Account not deleted.");
                     });
                     getApp().getAppExecutor().
@@ -138,7 +144,7 @@ public class AccountsListController extends Controller {
         Task<List<Account>> task = TaskUtils.getAllAccounts(t->{
             this.accounts = t.getValue();
             setAccounts(this.accounts);
-        },t->t.getException().printStackTrace());
+        },t->Log.error(TAG,"load accounts",t.getException()));
         queryTask = getApp().getAppExecutor().submit(task);
     }
 

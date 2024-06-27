@@ -50,7 +50,7 @@ public class BalancesheetApp extends Application {
                 .setTitle("Balance Sheet")
                 .setFxml("dashboard.fxml")
                 .setShowInDifferentWindow(false)
-                .setStyleSheet("theme.css","colors.css")
+                .setStyleSheet("theme.css")
                 .build();
         viewLauncher.load();
         viewLauncher.getWindow().setMaximized(true);

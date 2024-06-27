@@ -7,9 +7,8 @@
 
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="600" prefHeight="400"
-
-      spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.HistoryFilterController">
+<VBox prefWidth="600" prefHeight="400" spacing="10"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.HistoryFilterController">
     <HBox style="-fx-padding: 16px"
             alignment="TOP_RIGHT" spacing="12">
         <Button text="Reset" onAction="#handleReset"/>
@@ -17,13 +16,9 @@
     </HBox>
 
     <TabPane prefWidth="500" prefHeight="400" HBox.hgrow="ALWAYS">
-        <Tab closable="false" text="Accounts" fx:id="tabAccounts">
-        </Tab>
-        <Tab closable="false" text="Categories" fx:id="tabCategories">
-        </Tab>
-        <Tab closable="false" text="Miscellaneous" fx:id="tabMisc">
-
-        </Tab>
+        <Tab closable="false" text="Accounts" fx:id="tabAccounts"/>
+        <Tab closable="false" text="Categories" fx:id="tabCategories"/>
+        <Tab closable="false" text="Miscellaneous" fx:id="tabMisc"/>
     </TabPane>
 
 </VBox>

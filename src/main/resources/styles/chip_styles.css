@@ -8,18 +8,27 @@
 }
 
 .chip-label {
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .chip-close-button {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-text-fill: #a70000;
-    -fx-cursor: hand;
+    -fx-padding: 4px; /* Padding */
+    -fx-effect: none;
 }
 
 .chip-close-button:hover {
     -fx-text-fill: #ffe9e9;
     -fx-background-radius: 50%;
-    -fx-background-color: #a70000
+    -fx-background-color: primaryColor;
+}
+
+.chip-close-button > .ikonli-font-icon {
+    -fx-icon-color: primaryColor;
+    -fx-icon-size: 16px;
+}
+
+.chip-close-button > .ikonli-font-icon:hover {
+    -fx-icon-color: onPrimary;
 }

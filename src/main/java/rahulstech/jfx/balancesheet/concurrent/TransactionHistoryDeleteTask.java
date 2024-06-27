@@ -7,11 +7,14 @@ import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
+import rahulstech.jfx.balancesheet.util.Log;
 
 import java.util.List;
 
 @SuppressWarnings("ALL")
 public class TransactionHistoryDeleteTask extends Task<Boolean> {
+
+    private static final String TAG = TransactionHistoryDeleteTask.class.getSimpleName();
 
     private final List<TransactionHistory> histories;
 
@@ -31,17 +34,16 @@ public class TransactionHistoryDeleteTask extends Task<Boolean> {
     }
 
     private void deleteHistory(TransactionHistory history) {
-        TransactionType type = history.getType();
         if(!BalancesheetDb.getInstance().getTransactionHistoryDao().deleteTransactionHistory(history)) {
             return;
         }
-        Currency changeForSrcAccount = calculateAmountChangeForSrcAccount(history);
-        Currency taxChangeForSrcAccount = calculateTaxChangeForSrcAccount(history);
-        Currency balanceChangeForSrcAccount = changeForSrcAccount.add(taxChangeForSrcAccount);
-        updateAccountBalance(history.getSrc(),balanceChangeForSrcAccount);
-        if (type == TransactionType.TRANSFER) {
-            Currency changeForDestAccount = changeForSrcAccount.negate();
-            updateAccountBalance(history.getDest(),changeForDestAccount);
+        if (null!=history.getSrc()) {
+            Currency change = calculateAmountChangeForSrcAccount(history);
+            updateAccountBalance(history.getSrc(),change);
+        }
+        if (null!=history.getDest()) {
+            Currency change = calculateAmountChangeForDestAccount(history);
+            updateAccountBalance(history.getDest(),change);
         }
     }
 
@@ -55,17 +57,32 @@ public class TransactionHistoryDeleteTask extends Task<Boolean> {
 
     private Currency calculateAmountChangeForSrcAccount(TransactionHistory history) {
         Currency amount = history.getAmount();
+        Currency tax = null==history.getTax() || !history.isTaxSrc() ? Currency.ZERO : history.getTax();
         TransactionType type = history.getType();
+        Currency change;
         if (type == TransactionType.DEPOSIT) {
-            return amount.negate();
+            change = amount.negate().add(tax);
         }
         else {
-            return amount;
+            change = amount.add(tax);
         }
+        Log.trace(TAG,"calculateAmountChangeForSrcAccount(): change="+change);
+        return change;
     }
 
-    private Currency calculateTaxChangeForSrcAccount(TransactionHistory history) {
-        return null==history.getTax() ? Currency.ZERO : history.getTax();
+    private Currency calculateAmountChangeForDestAccount(TransactionHistory history) {
+        Currency amount = history.getAmount();
+        Currency tax = null==history.getTax() || history.isTaxSrc() ? Currency.ZERO : history.getTax();
+        TransactionType type = history.getType();
+        Currency change;
+        if (type == TransactionType.TRANSFER) {
+            change = amount.negate().add(tax);
+        }
+        else {
+            change = Currency.ZERO;
+        }
+        Log.trace(TAG,"calculateAmountChangeForDestAccount(): change="+change);
+        return change;
     }
 }
 

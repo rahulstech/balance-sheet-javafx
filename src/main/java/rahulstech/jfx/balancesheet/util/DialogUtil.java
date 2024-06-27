@@ -1,5 +1,6 @@
 package rahulstech.jfx.balancesheet.util;
 
+import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -23,6 +24,7 @@ public class DialogUtil {
         ProgressDialogController controller = loader.getController();
         controller.setMessage(message);
         controller.setIndeterminate(true);
+        controller.getWindow().setOnCloseRequest(Event::consume);
         return loader.getWindow();
     }
 
@@ -60,6 +62,4 @@ public class DialogUtil {
         alert.initOwner(owner);
         alert.show();
     }
-
-
 }

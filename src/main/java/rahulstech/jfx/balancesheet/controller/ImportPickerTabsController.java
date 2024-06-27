@@ -8,6 +8,7 @@ import rahulstech.jfx.balancesheet.json.model.Account;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
 import rahulstech.jfx.balancesheet.json.model.Person;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
 public class ImportPickerTabsController extends Controller {
+
+    private static final String TAG = ImportPickerTabsController.class.getSimpleName();
 
     @FXML
     private Tab tabAccounts;
@@ -66,7 +69,6 @@ public class ImportPickerTabsController extends Controller {
     private void handleAddSelected() {
         Stage stage = DialogUtil.showIndeterminateProgressDialog(getWindow(),"Message",
                 "Adding imported values into database in progress. please wait till finish.");
-        stage.setOnCloseRequest(e->e.consume());
         stage.show();
 
         List<Account> accounts = accountsController.getAllSelectedAccounts();
@@ -103,7 +105,7 @@ public class ImportPickerTabsController extends Controller {
             getWindow().close();
         }
         else {
-            error.printStackTrace();
+            Log.error(TAG,"insert",error);
             DialogUtil.alertError(getWindow(),"Error","Fail to insert imported data into database. Please try again.");
         }
     }

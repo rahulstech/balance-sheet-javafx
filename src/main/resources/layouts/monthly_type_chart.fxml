@@ -6,25 +6,32 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="12" xmlns="http://javafx.com/javafx/11.0.1"
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<VBox spacing="10" xmlns="http://javafx.com/javafx/11.0.1"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.MonthlyTypeChartController">
     <padding>
         <Insets top="10" left="10" right="10" bottom="10"/>
     </padding>
-    <HBox VBox.vgrow="NEVER" style="-fx-padding: 12px 8px" spacing="6" alignment="CENTER">
-        <VBox spacing="8">
-            <Label text="Month Start" style="-fx-font-size: 14pt"/>
-            <ComboBox fx:id="monthStartComboBox" prefWidth="150.0"/>
-        </VBox>
-        <VBox spacing="8">
-            <Label text="Month End" style="-fx-font-size: 14pt"/>
-            <ComboBox fx:id="monthEndComboBox" prefWidth="150.0"/>
-        </VBox>
-        <VBox spacing="8">
-            <Label text="Type" style="-fx-font-size: 14pt"/>
-            <ComboBox fx:id="transactionTypeComboBox" prefWidth="120.0"/>
-        </VBox>
-        <Button fx:id="createChartButton" text="Create Chart" prefWidth="150" prefHeight="20"/>
+    <HBox VBox.vgrow="NEVER" spacing="10">
+        <HBox HBox.hgrow="ALWAYS" spacing="10">
+            <VBox spacing="8">
+                <Label text="Month Start"/>
+                <ComboBox fx:id="monthStartComboBox" prefWidth="150.0"/>
+            </VBox>
+            <VBox spacing="8">
+                <Label text="Month End"/>
+                <ComboBox fx:id="monthEndComboBox" prefWidth="150.0"/>
+            </VBox>
+            <VBox spacing="8">
+                <Label text="Type"/>
+                <ComboBox fx:id="transactionTypeComboBox" prefWidth="120.0"/>
+            </VBox>
+        </HBox>
+        <Button HBox.hgrow="NEVER" alignment="TOP_RIGHT" fx:id="createChartButton" text="Create Chart">
+            <graphic>
+                <FontIcon iconLiteral="mdi-chart-bar"/>
+            </graphic>
+        </Button>
     </HBox>
 
     <BarChart fx:id="barChart">

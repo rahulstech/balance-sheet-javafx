@@ -2,7 +2,7 @@
 /* Base style for the Material Design button */
 .button {
     -fx-background-color: primaryColor; /* Primary color */
-    -fx-text-fill: whiteColor; /* Text color */
+    -fx-text-fill: onPrimary; /* Text color */
     -fx-background-radius: 8px; /* Rounded corners */
     -fx-padding: 10px 20px; /* Padding */
     -fx-font-size: 14px; /* Font size */
@@ -22,8 +22,8 @@
     -fx-effect: none; /* Remove shadow when pressed */
 }
 
-/* Set text-fill color for any child inside the graphic of myButton */
-.button > .ikonli-font-icon {
-   -fx-icon-color: whiteColor;
+/* Set text-fill color for any child inside the graphic of button */
+.button > .ikonli-font-icon, .button > .stacked-ikonli-font-icon {
+   -fx-icon-color: onPrimary;
    -fx-icon-size: 20px;
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<VBox prefWidth="650" prefHeight="400" spacing="10"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="rahulstech.jfx.balancesheet.controller.BudgetFilterController">
+
+    <HBox spacing="10">
+        <padding>
+            <Insets top="16" bottom="16" left="12" right="12"/>
+        </padding>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <VBox spacing="10">
+                <Label text="Date Start" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+                <DatePicker fx:id="startDatePicker"/>
+            </VBox>
+
+            <VBox spacing="10">
+                <Label text="Date End" style="-fx-font-size: 14pt; -fx-min-width: 120px;"/>
+                <DatePicker fx:id="endDatePicker"/>
+            </VBox>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button text="Reset" onAction="#handleReset" prefWidth="120">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-broom"/>
+                </graphic>
+            </Button>
+            <Button text="Filter" onAction="#handleFilter" prefWidth="120">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-filter"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </HBox>
+
+    <VBox fx:id="containerCategory">
+
+    </VBox>
+
+</VBox>

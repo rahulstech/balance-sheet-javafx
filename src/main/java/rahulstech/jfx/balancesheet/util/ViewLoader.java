@@ -10,6 +10,8 @@ import rahulstech.jfx.balancesheet.controller.Controller;
 @SuppressWarnings("ALL")
 public class ViewLoader {
 
+    private static final String TAG = ViewLoader.class.getSimpleName();
+
     private Stage window;
     private Scene scene;
     private String fxml;
@@ -35,6 +37,7 @@ public class ViewLoader {
             this.controller = controller;
         }
         catch (Exception ex) {
+            Log.error(TAG,"load",ex);
             throw new RuntimeException(ex);
         }
         return this;

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.BudgetController">
+    <top>
+        <HBox alignment="CENTER_RIGHT" spacing="12">
+            <padding>
+                <Insets top="8" bottom="8" left="12" right="12"/>
+            </padding>
+            <Button text="Select All" onAction="#handleSelectButtonAction">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-select-all"/>
+                </graphic>
+            </Button>
+            <Button text="Delete Selected" onAction="#handleDeleteSelectedButtonAction">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-delete"/>
+                </graphic>
+            </Button>
+            <Button text="Edit Selected" onAction="#handleEditButtonAction">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-pencil"/>
+                </graphic>
+            </Button>
+            <Button text="Filter" onAction="#handleFilterButtonAction">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-filter"/>
+                </graphic>
+            </Button>
+            <Button text="Refresh" onAction="#handleRefreshButtonAction">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-refresh"/>
+                </graphic>
+            </Button>
+            <Button text="Add Budget" onAction="#handleAddButtonAction">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-plus"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </top>
+    <center>
+        <TableView fx:id="budgetTableView">
+            <columns>
+                <TableColumn text="Category" fx:id="categoryColumn" prefWidth="150"/>
+                <TableColumn text="Start Date" fx:id="startDateColumn" prefWidth="120"/>
+                <TableColumn text="End Date" fx:id="endDateColumn" prefWidth="120"/>
+                <TableColumn text="Amount" fx:id="amountColumn" prefWidth="100"/>
+                <TableColumn text="Description" fx:id="descriptionColumn" prefWidth="240"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

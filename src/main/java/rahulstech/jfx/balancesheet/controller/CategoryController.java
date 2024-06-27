@@ -5,9 +5,11 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.kordamp.ikonli.javafx.FontIcon;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
 public class CategoryController extends Controller {
+
+    private static final String TAG = CategoryController.class.getSimpleName();
 
     @FXML
     private TextField nameField;
@@ -58,7 +62,7 @@ public class CategoryController extends Controller {
             }
             Task<List<Category>> task = TaskUtils.filterCategory(categories,newValue,
                     t->setCategories(t.getValue()),
-                    t-> t.getException().printStackTrace());
+                    t-> Log.error(TAG,"filter-category",t.getException()));
             filterTask = getApp().getAppExecutor().submit(task);  // Submit the new task
         });
         loadCategories();
@@ -72,7 +76,7 @@ public class CategoryController extends Controller {
             this.categories = t.getValue();
             setCategories(this.categories);
                 },
-                t -> t.getException().printStackTrace());
+                t -> Log.error(TAG,"loadCatergories",t.getException()));
         queryTask = getApp().getAppExecutor().submit(task);
     }
 
@@ -85,9 +89,11 @@ public class CategoryController extends Controller {
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem editItem = new MenuItem("Edit");
+        editItem.setGraphic(new FontIcon("mdi-pencil"));
         editItem.setOnAction(event -> handleEditCategory(item));
 
         MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setGraphic(new FontIcon("mdi-delete"));
         deleteItem.setOnAction(event -> handleDeleteCategory(item));
 
         contextMenu.getItems().addAll(editItem, deleteItem);
@@ -115,9 +121,8 @@ public class CategoryController extends Controller {
                 }
                     },
                     task -> {
-                        task.getException().printStackTrace();
-                DialogUtil.alertError(getWindow(),"Save Error","Category not create");
-
+                        Log.error(TAG,"add-category", task.getException());
+                        DialogUtil.alertError(getWindow(),"Save Error","Category not create");
                     });
             getApp().getAppExecutor().execute(createTask);
         }
@@ -141,8 +146,8 @@ public class CategoryController extends Controller {
                             t->{
                         categoryList.getItems().remove(category);
                             },t->{
-                        DialogUtil.alertError(getWindow(),"Error","Fail to delete category. Please try again.");
-                                System.err.println(t.getException());
+                                Log.error(TAG,"delete-category", t.getException());
+                                DialogUtil.alertError(getWindow(),"Error","Fail to delete category. Please try again.");
                             });
                     getApp().getAppExecutor().
                             execute(task);

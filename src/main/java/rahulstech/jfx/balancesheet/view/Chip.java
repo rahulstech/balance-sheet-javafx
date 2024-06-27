@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
 import rahulstech.jfx.balancesheet.ResourceLoader;
 
 public class Chip extends HBox {
@@ -20,7 +21,9 @@ public class Chip extends HBox {
         label = new Label(text);
 
         // Initialize the close button
-        closeButton = new Button("X");
+        closeButton = new Button();
+        FontIcon closeIncon = new FontIcon("mdi-close");
+        closeButton.setGraphic(closeIncon);
         closeButton.setOnAction(e->handleCloseButtonClick());
 
         // Add label and close button to the HBox

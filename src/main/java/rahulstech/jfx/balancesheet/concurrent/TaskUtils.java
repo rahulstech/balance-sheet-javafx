@@ -3,14 +3,18 @@ package rahulstech.jfx.balancesheet.concurrent;
 import javafx.concurrent.Task;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.database.dao.AccountDao;
+import rahulstech.jfx.balancesheet.database.dao.BudgetFilterData;
 import rahulstech.jfx.balancesheet.database.dao.CategoryDao;
 import rahulstech.jfx.balancesheet.database.dao.ChartDao;
 import rahulstech.jfx.balancesheet.database.entity.Account;
+import rahulstech.jfx.balancesheet.database.entity.Budget;
 import rahulstech.jfx.balancesheet.database.entity.Category;
+import rahulstech.jfx.balancesheet.database.model.CategoryBudgetModel;
 import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
 import rahulstech.jfx.balancesheet.database.model.MonthlyTypeModel;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -127,6 +131,28 @@ public class TaskUtils {
 
     public static Task<Account> saveAccount(Account account, TaskCallback<Account> onSuccess, TaskCallback<Account> onFail) {
         return createTask(()-> BalancesheetDb.getInstance().getAccountDao().saveAccount(account),onSuccess,onFail);
+    }
+
+    public static Task<Budget> saveBudget(Budget budget, TaskCallback<Budget> onSuccess, TaskCallback<Budget> onFail) {
+        return createTask(()->BalancesheetDb.getInstance().getBudgetDao().saveBudget(budget),onSuccess,onFail);
+    }
+
+    public static Task<List<Budget>> filterBudget(BudgetFilterData data, TaskCallback<List<Budget>> onSuccess, TaskCallback<List<Budget>> onFail) {
+        return createTask(()->BalancesheetDb.getInstance().getBudgetDao().filter(data),onSuccess,onFail);
+    }
+
+    public static Task<List<CategoryBudgetModel>> getCategoryBudgetChartData(LocalDate start, LocalDate end, List<Category> categories,
+                                                                             TaskCallback<List<CategoryBudgetModel>> onSuccess,
+                                                                             TaskCallback<List<CategoryBudgetModel>> onFail) {
+        return createTask(()->{
+            ChartDao dao = BalancesheetDb.getInstance().getChartDao();
+            return dao.getCategoryBudget(start, end, categories);
+        },onSuccess,onFail);
+    }
+
+    public static Task<Boolean> deleteBudgets(List<Budget> budgets, TaskCallback<Boolean> onSuccess,
+                                              TaskCallback<Boolean> onFail ) {
+        return createTask(()-> budgets.size()==BalancesheetDb.getInstance().getBudgetDao().delete(budgets),onSuccess,onFail);
     }
 
     public interface TaskCallback<T> {

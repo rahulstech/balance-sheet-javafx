@@ -8,9 +8,12 @@ import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
+import rahulstech.jfx.balancesheet.util.Log;
 
 @SuppressWarnings("ALL")
 public class TransactionHistorySaveTask extends Task<TransactionHistory> {
+
+    private static final String TAG = TransactionHistorySaveTask.class.getSimpleName();
 
     private final TransactionHistory history;
 
@@ -26,13 +29,12 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
             boolean isEditing = 0!=this.history.getId();
             TransactionHistory old = isEditing ? dao.getTransactionHistoryById(this.history.getId()) : null;
             TransactionHistory saved = saveHistory(this.history);
-            TransactionType type = saved.getType();
-            Currency changeForSrcAccount = calculateAmountChangeForSrcAccount(old,saved);
-            Currency taxChangeForSrcAccount = calculateTaxChangeForSrcAccount(old,saved);
-            Currency srcBalanceChange = changeForSrcAccount.add(taxChangeForSrcAccount.negate());
-            updateAccountBalance(saved.getSrc(),srcBalanceChange);
-            if (type == TransactionType.TRANSFER) {
-                Currency changeForDestAccount = changeForSrcAccount.negate();
+            if (null!=saved.getSrc()) {
+                Currency srcBalanceChange = calculateAmountChangeForSrcAccount(old,saved);
+                updateAccountBalance(saved.getSrc(),srcBalanceChange);
+            }
+            if (null!=saved.getDest()){
+                Currency changeForDestAccount = calculateAmountChangeForDestAccount(old,saved);
                 updateAccountBalance(saved.getDest(),changeForDestAccount);
             }
             return saved;
@@ -48,32 +50,37 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
     }
 
     private Currency calculateAmountChangeForSrcAccount(TransactionHistory oldV, TransactionHistory newV) {
+        Currency old_amount = null==oldV ? Currency.ZERO : oldV.getAmount();
+        Currency old_tax = null==oldV || null==oldV.getAmount() || !oldV.isTaxSrc() ? Currency.ZERO : oldV.getTax();
         Currency new_amount = newV.getAmount();
+        Currency new_tax = null==newV.getTax() || !newV.isTaxSrc() ? Currency.ZERO : newV.getTax();
         TransactionType type = newV.getType();
-        if (null == oldV) {
-            if (type == TransactionType.DEPOSIT) {
-                return new_amount;
-            }
-            else {
-                return new_amount.negate();
-            }
-        }
-        Currency old_amount = oldV.getAmount();
-        if (type == TransactionType.DEPOSIT) {
-            return new_amount.subtract(old_amount);
+        Currency change;
+        if (type==TransactionType.DEPOSIT) {
+            change = new_amount.subtract(new_tax).subtract(old_amount).add(old_tax);
         }
         else {
-            return old_amount.subtract(new_amount);
+            change = old_amount.add(old_tax).subtract(new_amount).subtract(new_tax);
         }
+        Log.trace(TAG,"calculateAmountChangeForSrcAccount(): change="+change);
+        return change;
     }
 
-    private Currency calculateTaxChangeForSrcAccount(TransactionHistory oldV, TransactionHistory newV) {
-        Currency new_tax = null==newV.getTax() ? Currency.ZERO : newV.getTax();
-        if (null==oldV) {
-            return new_tax;
+    private Currency calculateAmountChangeForDestAccount(TransactionHistory oldV, TransactionHistory newV) {
+        Currency old_amount = null==oldV ? Currency.ZERO : oldV.getAmount();
+        Currency old_tax = null==oldV || null==oldV.getAmount() || oldV.isTaxSrc() ? Currency.ZERO : oldV.getTax();
+        Currency new_amount = newV.getAmount();
+        Currency new_tax = null==newV.getTax() || newV.isTaxSrc() ? Currency.ZERO : newV.getTax();
+        TransactionType type = newV.getType();
+        Currency change;
+        if (type==TransactionType.TRANSFER) {
+            change = new_amount.subtract(new_tax).subtract(old_amount).add(old_tax);
         }
-        Currency old_tax = null==oldV.getTax() ? Currency.ZERO : oldV.getTax();
-        return new_tax.subtract(old_tax);
+        else {
+            change = Currency.ZERO;
+        }
+        Log.trace(TAG,"calculateAmountChangeForSrcAccount(): change="+change);
+        return change;
     }
 
     private TransactionHistory saveHistory(TransactionHistory history) {

@@ -15,7 +15,8 @@ public class ChartBrowserController extends Controller {
 
     private ObservableList<String> CHARTS = FXCollections.observableArrayList(
             "Chart by Type Monthly",
-            "Chart by Category Monthly"
+            "Chart by Category Monthly",
+            "Chart by Category Budget"
     );
 
     @FXML
@@ -27,6 +28,8 @@ public class ChartBrowserController extends Controller {
     private MonthlyTypeChartController monthlyTypeChartController;
 
     private MonthlyCategoryChartController monthlyCategoryChartController;
+
+    private CategoryBudgetChartController categoryBudgetChartController;
 
     @Override
     protected void onInitialize(ResourceBundle res) {
@@ -42,6 +45,9 @@ public class ChartBrowserController extends Controller {
         }
         else if (selection == 1) {
             createMonthlyCategoryChart();
+        }
+        else if (selection == 2) {
+            createCategoryBudgetChart();
         }
     }
 
@@ -64,4 +70,13 @@ public class ChartBrowserController extends Controller {
         chartPane.getChildren().clear();
         chartPane.getChildren().add(root);
     }
-}
+
+    private void createCategoryBudgetChart() {
+        if (null == categoryBudgetChartController) {
+            ViewLoader loader = getViewLoader().setFxml("category_budget_chart.fxml").load();
+            this.categoryBudgetChartController = loader.getController();
+        }
+        Parent root = this.categoryBudgetChartController.getRoot();
+        chartPane.getChildren().clear();
+        chartPane.getChildren().add(root);
+    }}

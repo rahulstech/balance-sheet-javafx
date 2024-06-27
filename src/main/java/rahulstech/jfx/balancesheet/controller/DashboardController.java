@@ -10,6 +10,7 @@ import rahulstech.jfx.balancesheet.concurrent.ImportTask;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
 import java.io.File;
@@ -18,6 +19,8 @@ import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
 public class DashboardController extends Controller {
+
+    private static final String TAG = DashboardController.class.getSimpleName();
 
     @FXML
     private Button importButton;
@@ -34,13 +37,9 @@ public class DashboardController extends Controller {
     private Future<?> importTask;
 
     @Override
-    protected void onInitialize(ResourceBundle res) {
-        importButton.setOnAction(event -> handleImportButtonClick());
-        accountsButton.setOnAction(event -> handleAccountsButtonClick());
-        historiesButton.setOnAction(event -> handleHistoriesButtonClick());
-        chartsButton.setOnAction(event -> handleCharts());
-    }
+    protected void onInitialize(ResourceBundle res) {}
 
+    @FXML
     private void handleImportButtonClick() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
@@ -68,16 +67,14 @@ public class DashboardController extends Controller {
         // create and set up the import task
         ImportTask task = new ImportTask(json);
         task.setOnSucceeded(e -> {
-            DataModel result = task.getValue();
             importTask = null;
             dialog.close();
-            onImportComplete(true,result,null);
+            onImportComplete(true,task.getValue(),null);
         });
         task.setOnFailed(e -> {
-            Throwable exception = task.getException();
             importTask = null;
             dialog.close();
-            onImportComplete(false,null,exception);
+            onImportComplete(false,null,task.getException());
         });
         importTask = getApp().getAppExecutor().submit(task);
 
@@ -101,10 +98,12 @@ public class DashboardController extends Controller {
             loader.getWindow().show();
         }
         else {
+            Log.error(TAG,"import",exception);
             DialogUtil.alertError(getWindow(),"Error","json file is not imported");
         }
     }
 
+    @FXML
     private void handleAccountsButtonClick() {
         ViewLauncher loader = getViewLauncherBuilder()
                 .setTitle("Account")
@@ -117,6 +116,7 @@ public class DashboardController extends Controller {
         loader.getWindow().show();
     }
 
+    @FXML
     private void handleHistoriesButtonClick() {
         ViewLauncher loader = getViewLauncherBuilder()
                 .setTitle("Histories")
@@ -127,6 +127,7 @@ public class DashboardController extends Controller {
         loader.getWindow().show();
     }
 
+    @FXML
     private void handleCharts() {
         ViewLauncher loader = getViewLauncherBuilder()
                 .setTitle("Charts")
@@ -146,5 +147,16 @@ public class DashboardController extends Controller {
                         "This action is not undoable. Are you sure?",
                 "Yes Delete", BalancesheetDb::deleteDatabase,
                 "No Cancel",null);
+    }
+
+    @FXML
+    private void handleBudgetsButtonAction(ActionEvent event) {
+        ViewLauncher viewLauncher = getViewLauncherBuilder()
+                .setTitle("Budgets")
+                .setFxml("budget.fxml")
+                .build();
+        viewLauncher.load();
+        viewLauncher.getWindow().setMaximized(true);
+        viewLauncher.getWindow().show();
     }
 }

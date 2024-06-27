@@ -10,6 +10,7 @@ import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
+import rahulstech.jfx.balancesheet.util.Log;
 
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
@@ -17,6 +18,8 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("ALL")
 public class AccountInputController extends Controller {
+
+    private static final String TAG = AccountInputController.class.getSimpleName();
 
     @FXML
     private TextField nameField;
@@ -83,13 +86,12 @@ public class AccountInputController extends Controller {
         account.setBalance(balance);
 
         Stage dialog = DialogUtil.showIndeterminateProgressDialog(getWindow(),"Progress","Saving account, please wait");
-        dialog.setOnCloseRequest(e->e.consume());
         dialog.show();
         Task<Account> task = TaskUtils.saveAccount(account,t->{
             dialog.close();
             getWindow().close();
         },t->{
-            t.getException().printStackTrace();
+            Log.error(TAG,"save account", t.getException());
             dialog.close();
             DialogUtil.alertError(getWindow(),"Save Error","Account not saved");
         });
