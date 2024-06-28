@@ -41,7 +41,7 @@ public class CategoryController extends Controller {
     protected void onInitialize(ResourceBundle res) {
         categoryList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         categoryList.setCellFactory(listView -> {
-            ListCell<Category> cell = new ListCell<>() {
+            ListCell<Category> cell = new ListCell<Category>() {
                 @Override
                 protected void updateItem(Category item, boolean empty) {
                     super.updateItem(item, empty);

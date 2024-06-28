@@ -61,7 +61,7 @@ public class ViewLauncher {
         Stage ownerWindow = this.ownerWindow;
         Stage window;
         if (showInDifferentWindow) {
-            window = Objects.requireNonNullElseGet(this.window, Stage::new);
+            window = null!=this.window ? this.window : new Stage();
         }
         else {
             window = ownerWindow;

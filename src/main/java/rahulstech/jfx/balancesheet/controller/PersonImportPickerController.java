@@ -48,7 +48,7 @@ public class PersonImportPickerController extends Controller {
 
     private void initializeAccountList() {
         listView.getItems().addAll(people);
-        listView.setCellFactory(param -> new ListCell<>() {
+        listView.setCellFactory(param -> new ListCell<Person>() {
             @Override
             protected void updateItem(Person item, boolean empty) {
                 super.updateItem(item, empty);

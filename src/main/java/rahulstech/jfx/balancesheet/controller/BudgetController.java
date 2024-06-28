@@ -10,10 +10,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
-import rahulstech.jfx.balancesheet.concurrent.TransactionHistoryDeleteTask;
 import rahulstech.jfx.balancesheet.database.dao.BudgetFilterData;
 import rahulstech.jfx.balancesheet.database.entity.Budget;
-import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
@@ -55,7 +53,7 @@ public class BudgetController extends Controller {
 
         descriptionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDescription()));
 
-        descriptionColumn.setCellFactory(param -> new TableCell<>(){
+        descriptionColumn.setCellFactory(param -> new TableCell<Budget,String>(){
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);

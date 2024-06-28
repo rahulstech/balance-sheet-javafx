@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class TaskUtils {
 
     public static <T> Task<T> createTask(Callable<T> callable, TaskCallback<T> onSuccess, TaskCallback<T> onFail){
-        Task<T> task = new Task<>() {
+        Task<T> task = new Task<T>() {
             @Override
             protected T call() throws Exception {
                 return callable.call();

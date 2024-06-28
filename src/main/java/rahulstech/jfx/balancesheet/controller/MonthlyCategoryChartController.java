@@ -224,7 +224,7 @@ public class MonthlyCategoryChartController extends Controller {
     }
 
     private ComboBoxListCell<YearMonth> newComboBoxListCellForYearMonth() {
-        return new ComboBoxListCell<>() {
+        return new ComboBoxListCell<YearMonth>() {
             @Override
             public void updateItem(YearMonth yearMonth, boolean empty) {
                 super.updateItem(yearMonth, empty);

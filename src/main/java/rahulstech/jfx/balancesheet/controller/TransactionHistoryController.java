@@ -105,7 +105,7 @@ public class TransactionHistoryController extends Controller {
 
         typeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getType().toString()));
         descriptionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
-        descriptionColumn.setCellFactory(cellData->new TableCell<>(){
+        descriptionColumn.setCellFactory(cellData->new TableCell<TransactionHistory,String>(){
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -136,7 +136,7 @@ public class TransactionHistoryController extends Controller {
             return new SimpleStringProperty(categoryNames);
         });
 
-        categoriesColumn.setCellFactory(column -> new TableCell<>() {
+        categoriesColumn.setCellFactory(column -> new TableCell<TransactionHistory,String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);

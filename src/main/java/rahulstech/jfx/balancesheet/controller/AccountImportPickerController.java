@@ -35,7 +35,7 @@ public class AccountImportPickerController extends Controller {
     private void initializeAccountList() {
 
         listView.getItems().addAll(accounts);
-        listView.setCellFactory(param -> new ListCell<>() {
+        listView.setCellFactory(param -> new ListCell<Account>() {
             @Override
             protected void updateItem(Account item, boolean empty) {
                 super.updateItem(item, empty);

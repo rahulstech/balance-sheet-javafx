@@ -52,7 +52,7 @@ public class AccountInputController extends Controller {
             }
         };
 
-        StringConverter<Currency> converter = new StringConverter<>() {
+        StringConverter<Currency> converter = new StringConverter<Currency>() {
             @Override
             public String toString(Currency number) {
                 return null == number ? "" : number.toString();

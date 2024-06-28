@@ -7,7 +7,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
-import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Account;
@@ -39,10 +38,8 @@ public class AccountsListController extends Controller {
 
     @Override
     protected void onInitialize(ResourceBundle res) {
-        accountListView.setCellFactory(new Callback<>() {
-            @Override
-            public ListCell<Account> call(ListView<Account> listView) {
-                return new ListCell<>() {
+        accountListView.setCellFactory(listView->{
+            return new ListCell<Account>() {
                     @Override
                     protected void updateItem(Account account, boolean empty) {
                         super.updateItem(account, empty);
@@ -58,7 +55,6 @@ public class AccountsListController extends Controller {
                         }
                     }
                 };
-            }
         });
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {

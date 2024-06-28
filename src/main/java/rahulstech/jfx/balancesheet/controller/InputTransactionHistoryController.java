@@ -198,7 +198,7 @@ public class InputTransactionHistoryController extends Controller {
             }
         };
 
-        StringConverter<Currency> converter = new StringConverter<>() {
+        StringConverter<Currency> converter = new StringConverter<Currency>() {
             @Override
             public String toString(Currency number) {
                 return null == number ? "0" : number.toString();
