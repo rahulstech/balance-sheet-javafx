@@ -1,7 +1,6 @@
 package rahulstech.jfx.balancesheet.controller;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -77,8 +76,6 @@ public class BudgetController extends Controller {
         ViewLauncher launcher = getViewLauncherBuilder()
                 .setFxml("input_budget.fxml")
                 .setTitle("Add Budget")
-                .setHeight(400)
-                .setWidth(600)
                 .build();
         launcher.load();
         launcher.getWindow().show();
@@ -167,7 +164,8 @@ public class BudgetController extends Controller {
     }
 
     private void setTableItems(List<Budget> items) {
-        budgetTableView.setItems(FXCollections.observableList(items));
+        budgetTableView.getItems().clear();
+        budgetTableView.getItems().addAll(items);
     }
 
     @FXML

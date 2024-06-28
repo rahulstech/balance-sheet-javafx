@@ -76,5 +76,19 @@ public class Transaction {
     public void setPerson_id(Long person_id) {
         this.person_id = person_id;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "_id=" + _id +
+                ", date=" + date +
+                ", type=" + type +
+                ", deleted=" + deleted +
+                ", amount='" + amount + '\'' +
+                ", description='" + description + '\'' +
+                ", account_id=" + account_id +
+                ", person_id=" + person_id +
+                '}';
+    }
 }
 

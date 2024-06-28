@@ -3,6 +3,7 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.DatePicker;
@@ -48,8 +49,6 @@ public class CategoryBudgetChartController extends Controller {
     @Override
     protected void onInitialize(ResourceBundle res) {
         prepareChart();
-        setStartDate(LocalDate.now());
-        setEndDate(LocalDate.now());
     }
 
     private void prepareChart() {
@@ -96,6 +95,9 @@ public class CategoryBudgetChartController extends Controller {
 
     @SuppressWarnings("unchecked")
     private void setChartData(List<CategoryBudgetModel> items) {
+
+        categoryBudgetChart.getData().clear();
+
         XYChart.Series<String,Number> seriesCategory = new XYChart.Series<>();
         XYChart.Series<String,Number> seriesBudget = new XYChart.Series<>();
 
@@ -155,16 +157,21 @@ public class CategoryBudgetChartController extends Controller {
     }
 
     private List<Category> getSelectedCategories() {
-        if (categoryController.getCategoryList().getSelectionModel().isEmpty()) {
-            return null;
+        List<Category> categories = new ArrayList<>();
+        for (Node child : selectedCategoriesPanel.getChildren()) {
+            if (child instanceof Chip) {
+                Category category = (Category) child.getUserData();
+                categories.add(category);
+            }
         }
-        return new ArrayList<>(categoryController.getCategoryList().getSelectionModel().getSelectedItems());
+        return categories;
     }
 
     private void addCategories(List<Category> categories) {
         selectedCategoriesPanel.getChildren().clear();
         for (Category category : categories) {
             Chip chip = new Chip(category.getName());
+            chip.setUserData(category);
             selectedCategoriesPanel.getChildren().add(chip);
         }
     }

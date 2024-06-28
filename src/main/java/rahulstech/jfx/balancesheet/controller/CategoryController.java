@@ -1,7 +1,5 @@
 package rahulstech.jfx.balancesheet.controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -81,8 +79,8 @@ public class CategoryController extends Controller {
     }
 
     private void setCategories(List<Category> value) {
-        ObservableList<Category> categories = FXCollections.observableList(value);
-        categoryList.setItems(categories);
+        categoryList.getItems().clear();
+        categoryList.getItems().addAll(value);
     }
 
     private ContextMenu createContextMenu(Category item) {

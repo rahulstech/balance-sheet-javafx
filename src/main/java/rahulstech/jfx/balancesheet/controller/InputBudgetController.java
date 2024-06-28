@@ -102,8 +102,6 @@ public class InputBudgetController extends Controller {
             ViewLauncher launcher = getViewLauncherBuilder()
                     .setFxml("category.fxml")
                     .setTitle("Choose Category")
-                    .setWidth(600)
-                    .setHeight(500)
                     .build();
             launcher.load();
             categoryController = launcher.getController();

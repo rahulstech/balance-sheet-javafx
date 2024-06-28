@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.InputBudgetController"
-      spacing="10">
+      spacing="10" prefWidth="700" prefHeight="380">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>

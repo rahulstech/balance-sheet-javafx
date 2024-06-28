@@ -51,7 +51,7 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
 
     private Currency calculateAmountChangeForSrcAccount(TransactionHistory oldV, TransactionHistory newV) {
         Currency old_amount = null==oldV ? Currency.ZERO : oldV.getAmount();
-        Currency old_tax = null==oldV || null==oldV.getAmount() || !oldV.isTaxSrc() ? Currency.ZERO : oldV.getTax();
+        Currency old_tax = null==oldV || null==oldV.getTax() || !oldV.isTaxSrc() ? Currency.ZERO : oldV.getTax();
         Currency new_amount = newV.getAmount();
         Currency new_tax = null==newV.getTax() || !newV.isTaxSrc() ? Currency.ZERO : newV.getTax();
         TransactionType type = newV.getType();
@@ -68,7 +68,7 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
 
     private Currency calculateAmountChangeForDestAccount(TransactionHistory oldV, TransactionHistory newV) {
         Currency old_amount = null==oldV ? Currency.ZERO : oldV.getAmount();
-        Currency old_tax = null==oldV || null==oldV.getAmount() || oldV.isTaxSrc() ? Currency.ZERO : oldV.getTax();
+        Currency old_tax = null==oldV || null==oldV.getTax() || oldV.isTaxSrc() ? Currency.ZERO : oldV.getTax();
         Currency new_amount = newV.getAmount();
         Currency new_tax = null==newV.getTax() || newV.isTaxSrc() ? Currency.ZERO : newV.getTax();
         TransactionType type = newV.getType();

@@ -7,9 +7,13 @@ module rahulstech.jfx.balancesheet {
     requires javafx.fxml;
     requires javafx.graphics;
     requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.materialdesign;
     requires org.slf4j;
     requires ormlite.core;
     requires ormlite.jdbc;
+    requires org.xerial.sqlitejdbc;
+    requires ch.qos.logback.classic;
+    requires ch.qos.logback.core;
 
     opens rahulstech.jfx.balancesheet.json.model to com.google.gson;
 

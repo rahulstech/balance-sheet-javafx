@@ -13,12 +13,19 @@ import rahulstech.jfx.balancesheet.database.model.CategoryBudgetModel;
 import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
 import rahulstech.jfx.balancesheet.database.model.MonthlyTypeModel;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
+import rahulstech.jfx.balancesheet.json.JsonHelper;
+import rahulstech.jfx.balancesheet.json.model.DataModel;
 
+import java.io.File;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TaskUtils {
 
@@ -38,10 +45,31 @@ public class TaskUtils {
         return task;
     }
 
-    public static Task<YearMonth[]> getMinMaxHistoryDateQueryTask(TaskCallback<YearMonth[]> onSuccess, TaskCallback<YearMonth[]> onFail) {
+    public static Task<DataModel> importJSON(File file, TaskCallback<DataModel> onSuccess, TaskCallback<DataModel> onFail) {
+        return createTask(()-> JsonHelper.readJsonFile(file),onSuccess,onFail);
+    }
+    public static Task<List<YearMonth>> getYearMonthsListBetweenMinAndMaxHistoryDate(boolean asc,
+                                                                                     TaskCallback<List<YearMonth>> onSuccess,
+                                                                                     TaskCallback<List<YearMonth>> onFail) {
         return createTask(()->{
             ChartDao dao = BalancesheetDb.getInstance().getChartDao();
-            return dao.getMinMaxHistoryDates();
+            YearMonth[] min_max = dao.getMinMaxHistoryDates();
+            if (null==min_max) {
+                return Collections.emptyList();
+            }
+            YearMonth min = min_max[0];
+            YearMonth max = min_max[1];
+            final List<YearMonth> yearMonths = new ArrayList<>();
+            for (YearMonth now=min; max.equals(now) || max.isAfter(now); now=now.plusMonths(1)) {
+                yearMonths.add(now);
+            }
+            if (!asc) {
+                int size = yearMonths.size();
+                return IntStream.range(0,size)
+                        .mapToObj(i->yearMonths.get(size-1-i))
+                        .collect(Collectors.toList());
+            }
+            return yearMonths;
         },onSuccess,onFail);
     }
 

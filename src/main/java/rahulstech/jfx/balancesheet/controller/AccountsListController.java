@@ -1,7 +1,5 @@
 package rahulstech.jfx.balancesheet.controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -145,8 +143,8 @@ public class AccountsListController extends Controller {
     }
 
     private void setAccounts(List<Account> values) {
-        ObservableList<Account> accounts = FXCollections.observableList(values);
-        accountListView.setItems(accounts);
+        accountListView.getItems().clear();
+        accountListView.getItems().addAll(values);
     }
 }
 

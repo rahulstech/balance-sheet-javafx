@@ -23,7 +23,7 @@ java {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs.addAll(Arrays.asList("--release","9"))
+    options.compilerArgs.addAll(Arrays.asList("--release", "9"))
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -41,17 +41,14 @@ javafx {
 }
 
 dependencies {
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
-    // google gson
+    // Google Gson
     implementation 'com.google.code.gson:gson:2.8.9'
 
-    // ikonli font icons
+    // Ikonli font icons
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
-
-    // ikonli material icon packs
     implementation 'org.kordamp.ikonli:ikonli-materialdesign-pack:12.3.1'
 
     // ORMLite core library
@@ -63,9 +60,8 @@ dependencies {
     // SQLite JDBC driver
     implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
 
-    // slef4j logging
+    // SLF4J logging
     implementation 'org.slf4j:slf4j-api:1.7.30'
-
     implementation 'ch.qos.logback:logback-classic:1.4.12'
 }
 
@@ -77,18 +73,22 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'balancesheet'
+        name = 'Balance Sheet'
     }
     jpackage {
-        imageOptions = [
-                '--icon', './app_icon.png', // Path to your icon
-                '--app-version', '1.0.0', // Application version
-                '--vendor', 'Rahul\'s Tech', // Vendor name
-        ]
+        imageOptions = []
         installerOptions = [
-                '--linux-package-name','rahulstech.jfx.balancesheet', // linux package name
-                '--linux-deb-maintainer', 'rahulstech18@gmail.com', // email only
-                '--linux-app-category','Utility'
+            '--icon', './app_icon.png', // Path to your icon
+            '--name', 'Balance Sheet', // App name
+            '--description','App to record your day-to-day withdraws and deposites category wise and check your income expense patterns mothly,' +
+                    'also create budgets to be more target oriented', // Small description for app
+            '--app-version', '1.0.0', // Application version
+            '--vendor', 'Rahul\'s Tech', // Vendor name
+            '--linux-package-name', 'balancesheet', // Linux package name
+            '--linux-deb-maintainer', 'rahulstech18@gmail.com', // Email only
+            '--linux-app-category', 'Utility', // Application category
+            '--linux-shortcut', // Ensure a shortcut is created
+            //'-license-file','/path/to/licence.txt'
         ]
         installerType = 'deb' // Change to 'rpm' if needed
     }

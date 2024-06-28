@@ -1,7 +1,6 @@
 package rahulstech.jfx.balancesheet.controller;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,7 +12,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxListCell;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
@@ -28,8 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import static rahulstech.jfx.balancesheet.concurrent.TaskUtils.createTask;
 
 @SuppressWarnings("ALL")
 public class MonthlyCategoryChartController extends Controller {
@@ -56,106 +52,82 @@ public class MonthlyCategoryChartController extends Controller {
 
     private Future<?> chartDataTask;
 
+    private CategoryController categoryController;
+
     @Override
     protected void onInitialize(ResourceBundle res) {
         prepareChart();
         populateComboBoxes();
     }
 
-    private void setMonthlyCategoryData(List<MonthlyCategoryModel> data) {
-        Task<Map<String, Map<String, Currency>>> task = createTask(()->{
-                Map<String, Map<String, Currency>> monthCategoryAmount = new HashMap<>();
+    private void setMonthlyCategoryData(List<MonthlyCategoryModel> models) {
 
-                for (MonthlyCategoryModel model : data) {
-                    String month = model.getYearMonth().format(YEAR_MONTH_FORMAT_CHART);
-                    String category = model.getCategory().getName();
-                    Currency amount = model.getTotalAmount();
+        monthlyCategoryChart.getData().clear();
 
-                    monthCategoryAmount
-                            .computeIfAbsent(month, k -> new HashMap<>())
-                            .put(category, amount);
-                }
+        Map<String,Currency> category_sum = new HashMap<>();
+        Map<String,Long> category_count = new HashMap<>();
 
-                return monthCategoryAmount;
-            },t->{
+        for (MonthlyCategoryModel model : models) {
+            String category = model.getCategory().getName();
+            String month = model.getYearMonth().format(YEAR_MONTH_FORMAT_CHART);
+            Currency amount = model.getTotalAmount();
 
-            Map<String, Map<String, Currency>> monthCategoryAmount = t.getValue();
+            XYChart.Series<String,Number> series = monthlyCategoryChart.getData()
+                    .stream().filter(d->category.equals(d.getName())).findFirst()
+                    .orElseGet(()->{
+                        XYChart.Series<String, Number> newSeries = new XYChart.Series<>();
+                        newSeries.setName(category);
+                        monthlyCategoryChart.getData().add(newSeries);
+                        return newSeries;
+                    });
+            XYChart.Data<String,Number> data = new XYChart.Data<>();
+            data.setXValue(month);
+            data.setYValue(amount.getValue());
+            series.getData().add(data);
 
-            monthlyCategoryChart.getData().clear();
-            for (Map.Entry<String, Map<String, Currency>> entry : monthCategoryAmount.entrySet()) {
-                String month = entry.getKey();
-                Map<String, Currency> categories = entry.getValue();
+            Tooltip tooltip = new Tooltip(amount.toString());
+            Tooltip.install(data.getNode(),tooltip);
 
-                for (Map.Entry<String, Currency> categoryEntry : categories.entrySet()) {
-                    String category = categoryEntry.getKey();
-                    Currency amount = categoryEntry.getValue();
+            Currency sum = category_sum.getOrDefault(category,Currency.ZERO);
+            Long count = category_count.getOrDefault(category,0L);
+            sum = sum.add(amount);
+            count++;
+            category_sum.put(category,sum);
+            category_count.put(category,count);
+        }
 
-                    XYChart.Series<String, Number> series = monthlyCategoryChart.getData()
-                            .stream()
-                            .filter(s -> s.getName().equals(category))
-                            .findFirst()
-                            .orElseGet(() -> {
-                                XYChart.Series<String, Number> newSeries = new XYChart.Series<>();
-                                newSeries.setName(category);
-                                monthlyCategoryChart.getData().add(newSeries);
-                                return newSeries;
-                            });
+        for (String category : category_sum.keySet()) {
+            Currency sum = category_sum.get(category);
+            Long count = category_count.get(category);
+            Currency average = sum.divide(Currency.from(count));
 
-                    XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(month, amount.getValue());
-                    series.getData().add(dataPoint);
+            XYChart.Series<String,Number> series = monthlyCategoryChart.getData()
+                    .stream().filter(d->category.equals(d.getName())).findFirst().get();
+            XYChart.Data<String,Number> data = new XYChart.Data<>();
+            data.setXValue("Average");
+            data.setYValue(average.getValue());
+            series.getData().add(data);
 
-                    Tooltip tooltip = new Tooltip(amount.toString());
-                    Tooltip.install(dataPoint.getNode(), tooltip);
-                }
-            }
-
-            // Calculate and add average series
-            Map<String, Currency> categoryTotals = new HashMap<>();
-            Map<String, Integer> categoryCounts = new HashMap<>();
-
-            for (Map<String, Currency> categories : monthCategoryAmount.values()) {
-                for (Map.Entry<String, Currency> categoryEntry : categories.entrySet()) {
-                    categoryTotals.merge(categoryEntry.getKey(), categoryEntry.getValue(), Currency::add);
-                    categoryCounts.merge(categoryEntry.getKey(), 1, Integer::sum);
-                }
-            }
-
-            for (Map.Entry<String, Currency> totalEntry : categoryTotals.entrySet()) {
-                String category = totalEntry.getKey();
-                Currency total = totalEntry.getValue();
-                int count = categoryCounts.get(category);
-                String seriesName = "Average "+category;
-
-                XYChart.Series<String, Number> averageSeries = new XYChart.Series<>();
-                averageSeries.setName(seriesName);
-                monthlyCategoryChart.getData().add(averageSeries);
-
-                Currency average = total.divide(Currency.from(count));
-                XYChart.Data<String, Number> avgDataPoint = new XYChart.Data<>("Average", average.getValue());
-                averageSeries.getData().add(avgDataPoint);
-
-                Tooltip avgTooltip = new Tooltip(average.toString());
-                Tooltip.install(avgDataPoint.getNode(), avgTooltip);
-            }
-        },t-> Log.error(TAG,"monthly category chart data task",t.getException()));
-        getApp().getAppExecutor().submit(task);
+            Tooltip tooltip = new Tooltip(average.toString());
+            Tooltip.install(data.getNode(),tooltip);
+        }
     }
 
     @FXML
     private void handleAddCategoryButtonClick() {
         // For now, just add a new chip with sample text
-        ViewLauncher launcher = getViewLauncherBuilder()
-                .setFxml("category.fxml")
-                .setTitle("Choose Category")
-                .build().load();
-        CategoryController controller = launcher.getController();
-        controller.getCategoryList().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        Stage window = controller.getWindow();
-        window.show();
-        window.setOnCloseRequest(e->{
-            ObservableList<Category> selections = controller.getCategoryList().getSelectionModel().getSelectedItems();
-            addCategories(new ArrayList<>(selections));
-        });
+        if (null==categoryController) {
+            ViewLauncher launcher = getViewLauncherBuilder()
+                    .setFxml("category.fxml")
+                    .setTitle("Choose Category")
+                    .build().load();
+            categoryController = launcher.getController();
+            categoryController.getCategoryList().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            categoryController.getWindow().setOnCloseRequest(e->{
+                addCategories(categoryController.getCategoryList().getSelectionModel().getSelectedItems());
+            });
+        }
+        categoryController.getWindow().show();
     }
 
     private void addCategories(List<Category> categories) {
@@ -203,24 +175,16 @@ public class MonthlyCategoryChartController extends Controller {
         endMonthComboBox.setButtonCell(newComboBoxListCellForYearMonth());
 
         // Populate month start and month end combo-boxes with sample data
-        getApp().getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
-                    YearMonth[] result = task.getValue();
-                    if (null==result) {
-                        return;
-                    }
-                    YearMonth minMonth = result[0];
-                    YearMonth maxMonth = result[1];
-                    List<YearMonth> months = new ArrayList<>();
-                    // Loop from start to end and add each YearMonth to the list
-                    for (YearMonth yearMonth = minMonth; !yearMonth.isAfter(maxMonth); yearMonth = yearMonth.plusMonths(1)) {
-                        months.add(yearMonth);
-                    }
-                    startMonthComboBox.setItems(FXCollections.observableArrayList(months));
-                    endMonthComboBox.setItems(FXCollections.observableArrayList(months));
-                    startMonthComboBox.getSelectionModel().selectFirst();
-                    endMonthComboBox.getSelectionModel().selectFirst();
-                },
+        getApp().getAppExecutor().submit(TaskUtils.getYearMonthsListBetweenMinAndMaxHistoryDate(false,
+                task -> setComboBoxItems(task.getValue()),
                 task -> Log.error(TAG,"get min max month task",task.getException())));
+    }
+
+    private void setComboBoxItems(List<YearMonth> months) {
+        startMonthComboBox.setItems(FXCollections.observableArrayList(months));
+        endMonthComboBox.setItems(FXCollections.observableArrayList(months));
+        startMonthComboBox.getSelectionModel().selectFirst();
+        endMonthComboBox.getSelectionModel().selectFirst();
     }
 
     private ComboBoxListCell<YearMonth> newComboBoxListCellForYearMonth() {

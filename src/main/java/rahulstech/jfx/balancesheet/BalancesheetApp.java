@@ -3,13 +3,23 @@ package rahulstech.jfx.balancesheet;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
+import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SuppressWarnings("ALL")
 public class BalancesheetApp extends Application {
+
+    private static final String DEV_DATA_DIR = "./balancesheet-data-DEV";
+
+    private static final String DATA_DIR = "./balancesheet-data";
+
+    private static final String DATABASE_DIR = "/database";
+
+    private static final String LOG_DIR = "/logs";
 
     private static BalancesheetApp INSTANCE;
 
@@ -36,10 +46,39 @@ public class BalancesheetApp extends Application {
         return INSTANCE;
     }
 
+    public File getDataDirectory() {
+        File dir = new File(isDevelopment() ? DEV_DATA_DIR : DATA_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    public File getLogsDirectory() {
+        File dir = new File(getDataDirectory(),LOG_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    public File getDatabaseDirectory() {
+        File dir = new File(getDataDirectory(),DATABASE_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    public boolean isDevelopment() {
+        return false;
+    }
+
     @Override
     public void init() throws Exception {
         super.init();
-        getAppExecutor().execute(BalancesheetDb::getInstance);
+        Log.init(getLogsDirectory(),isDevelopment());
+        getAppExecutor().execute(()->BalancesheetDb.initialize(getDatabaseDirectory()));
     }
 
     @Override
@@ -67,6 +106,6 @@ public class BalancesheetApp extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 }

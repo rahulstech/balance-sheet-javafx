@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ALL")
 public class InsertTask extends Task<Boolean> {
 
+    private static final String TAG = InsertTask.class.getSimpleName();
+
     public static class FilterData {
         public List<rahulstech.jfx.balancesheet.json.model.Account> accounts;
         public List<Person> people;
@@ -71,7 +73,8 @@ public class InsertTask extends Task<Boolean> {
             }
         }
         if (filterData.importTransfers && null != moneyTransfers) {
-            List<MoneyTransfer> filteredTransfers = filterMoneyTransfersByAccounts(moneyTransfers,selected_accounts);
+            List<MoneyTransfer> filteredTransfers = filterTransferByDateRange(moneyTransfers,startDate,endDate);
+            filteredTransfers = filterMoneyTransfersByAccounts(filteredTransfers,selected_accounts);
             for (MoneyTransfer mt : filteredTransfers) {
                 TransactionHistory h = convertMoneyTransfer(mt);
                 histories.add(h);
@@ -112,8 +115,9 @@ public class InsertTask extends Task<Boolean> {
 
     private List<Transaction> filterTransactionsByAccounts(List<Transaction> transactions, List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
         List<Long> accountIds = getAccountIds(accounts);
-        return transactions.stream().filter(t-> accountIds.contains(t.getAccount_id()))
-                .collect(Collectors.toList());
+        return transactions.stream().filter(t-> {
+            return accountIds.contains(t.getAccount_id());
+        }).collect(Collectors.toList());
     }
 
     private List<Transaction> filterTransactionsByPeople(List<Transaction> transactions, List<Person> people) {
@@ -130,16 +134,10 @@ public class InsertTask extends Task<Boolean> {
 
     private List<Transaction> filterTransactionsByDateRange(List<Transaction> transactions, LocalDate start, LocalDate end) {
         return transactions.stream().filter(t-> {
-            boolean inRange = true;
-            if (null!=start) {
-                inRange &= !start.isAfter(t.getDate());
-            }
-            if (null!=end) {
-                inRange &= !end.isBefore(t.getDate());
-            }
+            LocalDate date = t.getDate();
+            boolean inRange = isDateWithinRange(date,start,end);
             return inRange;
-                })
-                .collect(Collectors.toList());
+        }).collect(Collectors.toList());
     }
 
     private List<MoneyTransfer> filterMoneyTransfersByAccounts(List<MoneyTransfer> transfers, List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
@@ -148,6 +146,21 @@ public class InsertTask extends Task<Boolean> {
             accountIds.contains(t.getPayee_account_id())
                     || accountIds.contains(t.getPayer_account_id()))
                     .collect(Collectors.toList());
+    }
+
+    private List<MoneyTransfer> filterTransferByDateRange(List<MoneyTransfer> transfers, LocalDate start, LocalDate end) {
+        return transfers.stream().filter(t-> {
+            LocalDate date = t.getWhen();
+            boolean inRange = isDateWithinRange(date,start,end);
+            return inRange;
+        }).collect(Collectors.toList());
+    }
+
+    private boolean isDateWithinRange(LocalDate date, LocalDate startDate, LocalDate endDate) {
+        boolean afterOrEqualStart = (startDate == null) || !date.isBefore(startDate);
+        boolean beforeOrEqualEnd = (endDate == null) || !date.isAfter(endDate);
+
+        return afterOrEqualStart && beforeOrEqualEnd;
     }
 
     private boolean insertAccounts(AccountDao accountDao, List<Account> accounts) {

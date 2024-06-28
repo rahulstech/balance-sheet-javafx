@@ -17,9 +17,9 @@
     <Label minWidth="120" text="Import Options:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
     <HBox alignment="CENTER" spacing="10"
           GridPane.rowIndex="2" GridPane.columnIndex="1">
-        <ScrollPane maxHeight="80" fitToWidth="true" hbarPolicy="NEVER">
+        <ScrollPane maxHeight="120" fitToWidth="true" hbarPolicy="NEVER">
             <FlowPane style="-fx-padding: 12;" fx:id="importOptionsFlowPane" hgap="10" vgap="10"/>
         </ScrollPane>
-        <Button text="Reset" minWidth="75" HBox.hgrow="NEVER" onAction="#handleResetButtonClick"/>
+        <Button text="Reset" HBox.hgrow="NEVER" onAction="#handleResetButtonClick"/>
     </HBox>
 </GridPane>

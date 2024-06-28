@@ -37,15 +37,11 @@ public class BudgetFilterController extends Controller {
         this.onFilterListener = onFilterListener;
     }
 
-    private void setInitialData(BudgetFilterData data) {
-
-    }
+    private void setInitialData(BudgetFilterData data) {}
 
     @Override
     protected void onInitialize(ResourceBundle res) {
         addCategoryListView();
-        setStartDate(LocalDate.now());
-        setEndDate(LocalDate.now());
     }
 
     private void setStartDate(LocalDate date) {

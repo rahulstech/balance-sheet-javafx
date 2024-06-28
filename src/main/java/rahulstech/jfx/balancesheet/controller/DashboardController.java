@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import rahulstech.jfx.balancesheet.concurrent.ImportTask;
+import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
@@ -65,18 +65,13 @@ public class DashboardController extends Controller {
         dialog.show();
 
         // create and set up the import task
-        ImportTask task = new ImportTask(json);
-        task.setOnSucceeded(e -> {
-            importTask = null;
+        importTask = getApp().getAppExecutor().submit(TaskUtils.importJSON(json,task -> {
             dialog.close();
             onImportComplete(true,task.getValue(),null);
-        });
-        task.setOnFailed(e -> {
-            importTask = null;
+            },task -> {
             dialog.close();
             onImportComplete(false,null,task.getException());
-        });
-        importTask = getApp().getAppExecutor().submit(task);
+        }));
 
         dialog.setOnCloseRequest(e->{
             // cancel the ongoing task
@@ -87,12 +82,14 @@ public class DashboardController extends Controller {
     }
 
     private void onImportComplete(boolean successful, DataModel result, Throwable exception) {
+        importTask = null;
         if (successful) {
             ImportPickerTabsController controller = new ImportPickerTabsController(result);
             ViewLauncher loader = getViewLauncherBuilder()
                     .setTitle("Chose What To Add")
                     .setFxml("import_picker_tabs.fxml")
                     .setController(controller)
+                    .setWidth(700)
                     .build()
                     .load();
             loader.getWindow().show();

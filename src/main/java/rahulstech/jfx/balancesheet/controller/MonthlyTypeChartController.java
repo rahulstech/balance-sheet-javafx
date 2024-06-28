@@ -96,15 +96,8 @@ public class MonthlyTypeChartController extends Controller {
         monthEndComboBox.setButtonCell(newComboBoxListCellForYearMonth());
 
         // Populate month start and month end combo-boxes with sample data
-        getApp().getAppExecutor().submit(TaskUtils.getMinMaxHistoryDateQueryTask(task -> {
-            YearMonth[] result = task.getValue();
-            if (null==result) {
-                return;
-            }
-            YearMonth minMonth = result[0];
-            YearMonth maxMonth = result[1];
-            setComboBoxItems(minMonth,maxMonth);
-        },
+        getApp().getAppExecutor().submit(TaskUtils.getYearMonthsListBetweenMinAndMaxHistoryDate(false,
+                task -> setComboBoxItems(task.getValue()),
                 task -> Log.error(TAG,"min max months",task.getException())));
 
         // Populate transaction type combo-box
@@ -112,12 +105,7 @@ public class MonthlyTypeChartController extends Controller {
         transactionTypeComboBox.getSelectionModel().selectFirst();
     }
 
-    private void setComboBoxItems(YearMonth minMonth, YearMonth maxMonth) {
-        List<YearMonth> months = new ArrayList<>();
-        // Loop from start to end and add each YearMonth to the list
-        for (YearMonth yearMonth = minMonth; !yearMonth.isAfter(maxMonth); yearMonth = yearMonth.plusMonths(1)) {
-            months.add(yearMonth);
-        }
+    private void setComboBoxItems(List<YearMonth> months) {
         monthStartComboBox.setItems(FXCollections.observableArrayList(months));
         monthEndComboBox.setItems(FXCollections.observableArrayList(months));
         monthStartComboBox.getSelectionModel().selectFirst();
