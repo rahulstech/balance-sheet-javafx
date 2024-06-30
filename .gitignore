@@ -3,8 +3,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-database/
-logs/
+balancesheet-data/
+balancesheet-data-DEV/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
