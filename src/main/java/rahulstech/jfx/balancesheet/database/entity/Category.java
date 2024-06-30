@@ -6,7 +6,7 @@ import java.util.Objects;
 
 @DatabaseTable(tableName = "categories")
 public class Category {
-    @DatabaseField(generatedId = true)
+    @DatabaseField(generatedId = true, allowGeneratedIdInsert = true)
     private long id;
 
     @DatabaseField(canBeNull = false, unique = true)

@@ -46,7 +46,7 @@ public class TransactionHistorySaveTask extends Task<TransactionHistory> {
         Currency balance = account.getBalance();
         Currency newBalance = balance.add(change);
         account.setBalance(newBalance);
-        dao.updateAccount(account);
+        dao.saveAccount(account);
     }
 
     private Currency calculateAmountChangeForSrcAccount(TransactionHistory oldV, TransactionHistory newV) {

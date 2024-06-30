@@ -82,7 +82,6 @@ public class ImportPickerTabsController extends Controller {
         filterData.startDate = startDate;
         filterData.accounts = accounts;
         filterData.people = people;
-        filterData.importAccounts = importOptions.contains(ImportMiscTabController.ImportOptions.Accounts);
         filterData.importCreditTransactions = importOptions.contains(ImportMiscTabController.ImportOptions.Credit);
         filterData.importDebitTransactions = importOptions.contains(ImportMiscTabController.ImportOptions.Debit);
         filterData.importTransfers = importOptions.contains(ImportMiscTabController.ImportOptions.Transfers);

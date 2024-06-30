@@ -14,8 +14,6 @@ import rahulstech.jfx.balancesheet.database.migration.Migration;
 import rahulstech.jfx.balancesheet.util.Log;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +28,13 @@ public class BalancesheetDb {
 
     private static final long DB_VERSION = 2;
 
-    private static String DB_FILE = "balance_sheet.db3";
+    private static final String DB_FILE_NAME = "balance_sheet.db3";
 
-    private File DB_DIR;
+    private static final File DEFAULT_DB_DIR = new File(".");
+
+    private static File DB_DIR;
+
+    private static File DB_FILE = null;
 
     private static final Class<?>[] ENTITIES = new Class<?>[]{
             Account.class, Category.class,
@@ -44,8 +46,6 @@ public class BalancesheetDb {
     private final List<DBCallback> CALLBACKS;
 
     private static BalancesheetDb INSTANCE = null;
-
-    private static boolean IS_INITIALIZED = false;
 
     private ConnectionSource connectionSource;
 
@@ -63,11 +63,12 @@ public class BalancesheetDb {
         CALLBACKS = Arrays.asList(
                 ADD_DEFAULT_CATEGORIES
         );
+        initialize(null==DB_DIR ? DEFAULT_DB_DIR : DB_DIR);
     }
 
     public synchronized static BalancesheetDb getInstance() {
-        if (!IS_INITIALIZED) {
-            throw new DatabaseException("database not initialized");
+        if (null==INSTANCE) {
+            INSTANCE = new BalancesheetDb();
         }
         return INSTANCE;
     }
@@ -102,97 +103,102 @@ public class BalancesheetDb {
 
     public void closeSilently() {
         try {
-            if (null != this.connectionSource) {
-                this.connectionSource.close();
+            if (null != connectionSource) {
+                connectionSource.close();
             }
         }
         catch (Exception ignore) {}
         finally {
-            this.connectionSource = null;
+            connectionSource = null;
             INSTANCE = null;
-            IS_INITIALIZED = false;
         }
     }
 
-    public static void deleteDatabase() {
+    public void deleteDatabase() {
         try{
-            if (null!= INSTANCE) {
-                INSTANCE.closeSilently();
+            closeSilently();
+            Log.info(TAG,"deleting database file=\""+DB_FILE+"\"");
+            if (DB_FILE.exists()) {
+                boolean deleted = DB_FILE.delete();
+                Log.info(TAG,"database file=\""+DB_FILE+"\" deleted="+deleted);
             }
-            Files.delete(Paths.get(new File(DB_FILE).toURI()));
         }
         catch (Exception ex) {
             Log.error(TAG,"deteleDatabase",ex);
         }
         finally {
-            INSTANCE = null;
-            IS_INITIALIZED = false;
+            DB_FILE = null;
         }
     }
 
-    private void setDatabaseDirectory(File dir) {
-        this.DB_DIR = dir;
+    public static void setDatabaseDirectory(File db_dir) {
+        DB_DIR = db_dir;
     }
 
-    public static void initialize(File dir) {
+    private void initialize(File dir) {
         ConnectionSource source = null;
+        boolean initialized = false;
         try {
             // set ormlite log level
-            com.j256.ormlite.logger.Logger.setGlobalLogLevel(com.j256.ormlite.logger.Level.WARNING);
+            com.j256.ormlite.logger.Level logLevel = com.j256.ormlite.logger.Level.ERROR;
+            com.j256.ormlite.logger.Logger.setGlobalLogLevel(logLevel);
 
-            BalancesheetDb dbInstance = new BalancesheetDb();
-
-            dbInstance.setDatabaseDirectory(dir);
+            // TODO: update logging mechanism so that ormlite logs are added to app log file
 
             // create connection source
-            source = dbInstance.newConnectionSource();
+            File db_file = new File(dir,DB_FILE_NAME);
+            source = newConnectionSource(db_file);
 
             // create internal table
-            DBVersion version = dbInstance.createVersionTable(source);
-            long newVersion = dbInstance.getCurrentDBVersion();
+            DBVersion version = createVersionTable(source);
+            long newVersion = getCurrentDBVersion();
 
             if (null==version) {
                 // Create all tables in one transaction
-                dbInstance.createTables(source, ENTITIES);
+                createTables(source, ENTITIES);
 
                 // call callback onCreate methods
-                dbInstance.callDBCallback_onCreate(source, dbInstance.CALLBACKS);
+                callDBCallback_onCreate(source, CALLBACKS);
 
                 // add the version
-                dbInstance.updateDBVersion(source,newVersion);
+                updateDBVersion(source,newVersion);
             }
-            else if (version.getVersion()!=dbInstance.getCurrentDBVersion()) {
+            else if (version.getVersion()!=getCurrentDBVersion()) {
                 // apply migration if required
-                dbInstance.applyMigrations(source,version.getVersion(),newVersion, dbInstance.MIGRATIONS);
+                applyMigrations(source,version.getVersion(),newVersion, MIGRATIONS);
 
                 // update the version
-                dbInstance.updateDBVersion(source,newVersion);
+                updateDBVersion(source,newVersion);
             }
 
             // create table dao
-            dbInstance.createDaos(source);
+            createDaos(source);
 
             // call callback onOpen methods
-            dbInstance.callDBCallback_onOpen(source,dbInstance.CALLBACKS);
+            callDBCallback_onOpen(source,CALLBACKS);
 
-            dbInstance.setConnectionSource(source);
-            INSTANCE = dbInstance;
-            IS_INITIALIZED = true;
+            setDatabaseFile(db_file);
+            setConnectionSource(source);
+            initialized = true;
         }
         catch (Exception ex) {
             throw new DatabaseException(ex);
         }
         finally {
-            if (!IS_INITIALIZED && null!=source) {
+            if (!initialized && null!=source) {
                 source.closeQuietly();
             }
         }
     }
 
-    private ConnectionSource newConnectionSource() throws Exception {
-        String db_file = new File(DB_DIR,DB_FILE).toString();
-        String DATABASE_URL = "jdbc:sqlite:"+db_file;
+    private ConnectionSource newConnectionSource(File db_file) throws Exception {
+        String db_file_path = db_file.toString();
+        String DATABASE_URL = "jdbc:sqlite:"+db_file_path;
         return new JdbcConnectionSource(DATABASE_URL);
+    }
+
+    private void setDatabaseFile(File db_file) {
+        this.DB_FILE = db_file;
     }
 
     private void setConnectionSource(ConnectionSource source) {

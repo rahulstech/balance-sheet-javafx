@@ -1,6 +1,5 @@
 package rahulstech.jfx.balancesheet.database.dao;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 
@@ -10,51 +9,41 @@ import java.util.List;
 import static rahulstech.jfx.balancesheet.database.dao.DaoUtil.callWithoutExceptionHandling;
 
 @SuppressWarnings("ALL")
-public class AccountDao {
-
-    private Dao<Account, Long> accountDao;
+public class AccountDao extends BaseDaoImpl<Account,Long> {
 
     public AccountDao(ConnectionSource connectionSource) throws SQLException {
-        accountDao = DaoManager.createDao(connectionSource, Account.class);
-    }
-
-    public boolean createAccount(Account account) {
-        return callWithoutExceptionHandling(()->1==accountDao.create(account));
+        super(connectionSource,Account.class);
     }
 
     public Account saveAccount(Account account) {
         return callWithoutExceptionHandling(()->{
-            if (1!=accountDao.createOrUpdate(account).getNumLinesChanged()) {
+            if (1!=createOrUpdate(account).getNumLinesChanged()) {
                 throw new SQLException("unable to save account");
             }
             return account;
         });
     }
 
+    @Deprecated
     public boolean createMultipleAccount(List<Account> accounts)  {
         return callWithoutExceptionHandling(()->{
             int count = accounts.size();
-            return count == accountDao.create(accounts);
+            return false;
         });
-    }
-
-    public boolean updateAccount(Account account) {
-        return callWithoutExceptionHandling(()->1==accountDao.update(account));
     }
 
     public boolean deleteAccounts(List<Account> accounts) {
         if (accounts == null || accounts.isEmpty()) {
             return false;
         }
-        return callWithoutExceptionHandling(()->accounts.size()==accountDao.delete(accounts));
-    }
-
-    public Account getAccountById(long id) {
-        return callWithoutExceptionHandling(()->accountDao.queryForId(id));
+        return callWithoutExceptionHandling(()->{
+            delete(accounts);
+            return true;
+        });
     }
 
     public List<Account> getAllAccounts() {
-        return callWithoutExceptionHandling(()->accountDao.queryForAll());
+        return callWithoutExceptionHandling(()->queryForAll());
     }
 
     // Add more methods as needed

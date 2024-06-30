@@ -8,7 +8,8 @@ import rahulstech.jfx.balancesheet.database.type.DbTypeCurrency;
 @DatabaseTable(tableName = "accounts")
 public class Account {
 
-    @DatabaseField(generatedId = true)
+    // generatedId = true and allowGeneratedIdInsert = true => id == 0 then generate id else use provided id
+    @DatabaseField(generatedId = true, allowGeneratedIdInsert = true)
     private long id;
 
     @DatabaseField(canBeNull = false)

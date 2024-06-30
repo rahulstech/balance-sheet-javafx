@@ -1,5 +1,6 @@
 package rahulstech.jfx.balancesheet.database.dao;
 
+import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.misc.TransactionManager;
@@ -18,49 +19,49 @@ import java.util.List;
 
 import static rahulstech.jfx.balancesheet.database.dao.DaoUtil.callWithoutExceptionHandling;
 
-public class TransactionHistoryDao {
+public class TransactionHistoryDao extends BaseDaoImpl<TransactionHistory,Long> {
 
-    private final ConnectionSource source;
-    private final Dao<TransactionHistory, Long> transactionHistoryDao;
     private final Dao<HistoryCategory, Long> historyCategoriesDao;
 
     public TransactionHistoryDao(ConnectionSource connectionSource) throws SQLException {
-        this.source = connectionSource;
-        transactionHistoryDao = DaoManager.createDao(connectionSource, TransactionHistory.class);
+        super(connectionSource,TransactionHistory.class);
         historyCategoriesDao = DaoManager.createDao(connectionSource, HistoryCategory.class);
     }
 
     public TransactionHistory saveTransaction(TransactionHistory history) {
         return callWithoutExceptionHandling(()->
-                TransactionManager.callInTransaction(source,()->{
-                    if (1==transactionHistoryDao.createOrUpdate(history).getNumLinesChanged()) {
-                        updateHistoryCategories(history);
-                        return history;
+                TransactionManager.callInTransaction(getConnectionSource(),()->{
+                    CreateOrUpdateStatus status = createOrUpdate(history);
+                    if (status.isCreated()&&1!=status.getNumLinesChanged()) {
+                        throw new SQLException("fail to save history");
                     }
-                    throw new SQLException("fail to save transaction_history");
+                    updateHistoryCategories(history);
+                    return history;
                 })
         );
     }
 
-    public boolean createMultipleTransactionHistory(List<TransactionHistory> histories) {
-        if (null == histories || histories.isEmpty()) {
-            return false;
+    public  void insertTransactionHistories(List<TransactionHistory> histories) {
+        if (null==histories || histories.isEmpty()) {
+            return;
         }
-        return callWithoutExceptionHandling(()->histories.size() == transactionHistoryDao.create(histories));
+        callWithoutExceptionHandling(()->{
+            create(histories);
+            return null;
+        });
     }
 
     public boolean deleteTransactionHistory(TransactionHistory transactionHistory) {
-        return callWithoutExceptionHandling(()-> TransactionManager.callInTransaction(source,()->{
-                if (1==transactionHistoryDao.delete(transactionHistory)){
+        return callWithoutExceptionHandling(()-> TransactionManager.callInTransaction(getConnectionSource(),()->{
+                if (1==delete(transactionHistory)){
                     removeHistoryCategoriesForHistory(transactionHistory);
-                    return true;
                 }
-                return false;
+                return true;
             }));
     }
 
     public TransactionHistory getTransactionHistoryById(long id) {
-        return callWithoutExceptionHandling(()->transactionHistoryDao.queryForId(id));
+        return callWithoutExceptionHandling(()->queryForId(id));
     }
 
     public List<TransactionHistory> getAllTransactionHistoryByData(HistoryFilterData data) {
@@ -73,7 +74,7 @@ public class TransactionHistoryDao {
             int orderBy = data.getOrderBy();
             boolean asc = data.isOrderByAscending();
 
-            QueryBuilder<TransactionHistory,Long> queryBuilder = transactionHistoryDao.queryBuilder();
+            QueryBuilder<TransactionHistory,Long> queryBuilder = queryBuilder();
             Where<TransactionHistory,Long> where = queryBuilder.where();
 
             if (null != categories && !categories.isEmpty()) {
@@ -101,7 +102,7 @@ public class TransactionHistoryDao {
                 case HistoryFilterData.ORDER_BY_WHEN: queryBuilder.orderBy("when",asc);
             }
             PreparedQuery<TransactionHistory> query = queryBuilder.prepare();
-            return  transactionHistoryDao.query(query);
+            return  query(query);
         });
     }
 

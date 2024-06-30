@@ -142,7 +142,7 @@ public class DashboardController extends Controller {
         DialogUtil.alertConfirmation(getWindow(),
                 "Warning Delete","This action will cause permanent loss of data. " +
                         "This action is not undoable. Are you sure?",
-                "Yes Delete", BalancesheetDb::deleteDatabase,
+                "Yes Delete",()-> BalancesheetDb.getInstance().deleteDatabase(),
                 "No Cancel",null);
     }
 

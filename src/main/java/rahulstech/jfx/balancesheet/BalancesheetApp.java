@@ -1,6 +1,7 @@
 package rahulstech.jfx.balancesheet;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.util.Log;
@@ -71,6 +72,7 @@ public class BalancesheetApp extends Application {
     }
 
     public boolean isDevelopment() {
+        // TODO: implement method to check development or release version
         return false;
     }
 
@@ -78,12 +80,19 @@ public class BalancesheetApp extends Application {
     public void init() throws Exception {
         super.init();
         Log.init(getLogsDirectory(),isDevelopment());
-        getAppExecutor().execute(()->BalancesheetDb.initialize(getDatabaseDirectory()));
+        getAppExecutor().execute(()->{
+            BalancesheetDb.setDatabaseDirectory(getDatabaseDirectory());
+            BalancesheetDb.getInstance();
+        });
     }
 
     @Override
     public void start(Stage stage) {
         appWindow = stage;
+        stage.setOnCloseRequest(e->{
+            Platform.exit();
+            System.exit(0);
+        });
         ViewLauncher viewLauncher = new ViewLauncher.Builder()
                 .setOwnerWindow(stage)
                 .setTitle("Balance Sheet")

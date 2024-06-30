@@ -16,7 +16,6 @@ import java.util.ResourceBundle;
 public class ImportMiscTabController extends Controller {
 
     public static enum ImportOptions {
-        Accounts,
         Transfers,
         Credit,
         Debit,

@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 balancesheet-data/
 balancesheet-data-DEV/
+installables/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

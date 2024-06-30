@@ -12,8 +12,8 @@ import rahulstech.jfx.balancesheet.json.model.DataModel;
 import rahulstech.jfx.balancesheet.json.model.MoneyTransfer;
 import rahulstech.jfx.balancesheet.json.model.Person;
 import rahulstech.jfx.balancesheet.json.model.Transaction;
+import rahulstech.jfx.balancesheet.util.Log;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +28,6 @@ public class InsertTask extends Task<Boolean> {
         public List<Person> people;
         public LocalDate startDate;
         public LocalDate endDate;
-        public  boolean importAccounts = true;
         public boolean importCreditTransactions = true;
         public boolean importDebitTransactions = true;
         public boolean importTransfers = true;
@@ -36,7 +35,6 @@ public class InsertTask extends Task<Boolean> {
 
     private final DataModel model;
     private final FilterData filterData;
-    private Map<Long,Account> map_accountId_account;
 
     public InsertTask(DataModel model, FilterData filterData) {
         this.model = model;
@@ -52,43 +50,53 @@ public class InsertTask extends Task<Boolean> {
         List<Person> selected_people = this.filterData.people;
         LocalDate startDate= this.filterData.startDate;
         LocalDate endDate = this.filterData.endDate;
+        boolean importHistories = this.filterData.importDebitTransactions
+                || this.filterData.importCreditTransactions
+                || this.filterData.importTransfers;
 
-        List<Account> accounts = convertTo_entity_Account(selected_accounts);
-        map_accountId_account = createAccountIdAccountMap(accounts);
-        List<TransactionHistory> histories = new ArrayList<>();
-        if ((filterData.importCreditTransactions || filterData.importDebitTransactions) && null != transactions) {
-            List<Transaction> filteredTransactions = filterTransactionsByNotDeleted(transactions);
-            filteredTransactions = filterTransactionsByDateRange(filteredTransactions,startDate,endDate);
-            filteredTransactions = filterTransactionsByAccounts(filteredTransactions,selected_accounts);
-            filteredTransactions = filterTransactionsByPeople(filteredTransactions,selected_people);
-            if (!filterData.importCreditTransactions) {
-                filteredTransactions = filteredTransactions.stream().filter(t->t.getType()!=1).collect(Collectors.toList());
+        final List<Account> accounts;
+        final List<TransactionHistory> histories;
+
+        Log.info(TAG,"will import "+(null==selected_accounts ? 0 : selected_accounts.size())+" accounts");
+        accounts = convertTo_entity_Account(selected_accounts);
+
+        if (importHistories){
+            histories = new ArrayList<>();
+            if ((filterData.importCreditTransactions || filterData.importDebitTransactions) && null != transactions) {
+                List<Transaction> filteredTransactions = filterTransactionsByNotDeleted(transactions);
+                filteredTransactions = filterTransactionsByDateRange(filteredTransactions,startDate,endDate);
+                filteredTransactions = filterTransactionsByAccounts(filteredTransactions,selected_accounts);
+                filteredTransactions = filterTransactionsByPeople(filteredTransactions,selected_people);
+                if (!filterData.importCreditTransactions) {
+                    filteredTransactions = filteredTransactions.stream().filter(t->t.getType()!=1).collect(Collectors.toList());
+                }
+                if (!filterData.importDebitTransactions){
+                    filteredTransactions = filteredTransactions.stream().filter(t->t.getType()!=0).collect(Collectors.toList());
+                }
+                for (Transaction t : filteredTransactions) {
+                    TransactionHistory h = convertTransaction(t);
+                    histories.add(h);
+                }
             }
-            if (!filterData.importDebitTransactions){
-                filteredTransactions = filteredTransactions.stream().filter(t->t.getType()!=0).collect(Collectors.toList());
+            if (filterData.importTransfers && null != moneyTransfers) {
+                List<MoneyTransfer> filteredTransfers = filterTransferByDateRange(moneyTransfers,startDate,endDate);
+                filteredTransfers = filterMoneyTransfersByAccounts(filteredTransfers,selected_accounts);
+                for (MoneyTransfer mt : filteredTransfers) {
+                    TransactionHistory h = convertMoneyTransfer(mt);
+                    histories.add(h);
+                }
             }
-            for (Transaction t : filteredTransactions) {
-                TransactionHistory h = convertTransaction(t);
-                histories.add(h);
-            }
+            Log.info(TAG,"will import "+histories.size()+" histories");
         }
-        if (filterData.importTransfers && null != moneyTransfers) {
-            List<MoneyTransfer> filteredTransfers = filterTransferByDateRange(moneyTransfers,startDate,endDate);
-            filteredTransfers = filterMoneyTransfersByAccounts(filteredTransfers,selected_accounts);
-            for (MoneyTransfer mt : filteredTransfers) {
-                TransactionHistory h = convertMoneyTransfer(mt);
-                histories.add(h);
-            }
+        else {
+            histories = null;
         }
 
         BalancesheetDb db = BalancesheetDb.getInstance();
         return db.inTransaction(()->{
-            boolean accountsInserted = !this.filterData.importAccounts || insertAccounts(db.getAccountDao(), accounts);
-            boolean historiesInserted = insertTransactionHistories(db.getTransactionHistoryDao(), histories);
-          if (accountsInserted && historiesInserted) {
-              return true;
-          }
-          throw new SQLException("database insert fail");
+            insertAccounts(db.getAccountDao(),accounts);
+            insertTransactionHistories(db.getTransactionHistoryDao(), histories);
+            return true;
         });
     }
 
@@ -114,6 +122,9 @@ public class InsertTask extends Task<Boolean> {
     }
 
     private List<Transaction> filterTransactionsByAccounts(List<Transaction> transactions, List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
+        if (null==accounts || accounts.isEmpty()) {
+            return Collections.emptyList();
+        }
         List<Long> accountIds = getAccountIds(accounts);
         return transactions.stream().filter(t-> {
             return accountIds.contains(t.getAccount_id());
@@ -163,12 +174,36 @@ public class InsertTask extends Task<Boolean> {
         return afterOrEqualStart && beforeOrEqualEnd;
     }
 
+    /**
+     * insert multiple imported accounts
+     * <br/>
+     * <br/>
+     * bug fixed {@link https://github.com/rahulstech/balance-sheet-javafx/issues/1 #1}
+     *
+     * @param accountDao the dao
+     * @param accounts the list of accounts to inserted
+     * @return {@literal true} if successfully inserted, {@literal false} otherwise
+     */
     private boolean insertAccounts(AccountDao accountDao, List<Account> accounts) {
-        return accountDao.createMultipleAccount(accounts);
+        try {
+            int count = 0;
+            for (Account account : accounts) {
+                Account returned = accountDao.createIfNotExists(account);
+                if (returned==account) {
+                    count++;
+                }
+            }
+            Log.info(TAG,"insertAccounts: given="+accounts.size()+" inserted="+count);
+            return true;
+        }
+        catch (Exception ex) {
+            Log.debug(TAG,"insertAccounts",ex);
+            return false;
+        }
     }
 
-    private boolean insertTransactionHistories(TransactionHistoryDao transactionHistoryDao, List<TransactionHistory> histories) {
-        return transactionHistoryDao.createMultipleTransactionHistory(histories);
+    private void insertTransactionHistories(TransactionHistoryDao transactionHistoryDao, List<TransactionHistory> histories) {
+        transactionHistoryDao.insertTransactionHistories(histories);
     }
 
     private List<Account> convertTo_entity_Account(List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {
@@ -184,17 +219,6 @@ public class InsertTask extends Task<Boolean> {
             list.add(account);
         }
         return list;
-    }
-
-    private Map<Long,Account> createAccountIdAccountMap(List<Account> accounts) {
-        if (null == accounts) {
-            return Collections.emptyMap();
-        }
-        Map<Long,Account> map = new HashMap<>();
-        for (Account ac : accounts) {
-            map.put(ac.getId(),ac);
-        }
-        return map;
     }
 
     private TransactionHistory convertTransaction(Transaction transaction) {
@@ -214,8 +238,11 @@ public class InsertTask extends Task<Boolean> {
         transactionHistory.setDescription(transaction.getDescription());
 
         // Get the account using account_id and set it as src in TransactionHistory
-        Account account = getAccountById(transaction.getAccount_id());
-        transactionHistory.setSrc(account);
+        if (null!=transaction.getAccount_id()) {
+            Account account = new Account();
+            account.setId(transaction.getAccount_id());
+            transactionHistory.setSrc(account);
+        }
 
         return transactionHistory;
     }
@@ -231,16 +258,17 @@ public class InsertTask extends Task<Boolean> {
         transactionHistory.setType(TransactionType.TRANSFER);
 
         // Fetching and setting Account objects
-        Account srcAccount = getAccountById(moneyTransfer.getPayer_account_id());
-        Account destAccount = getAccountById(moneyTransfer.getPayee_account_id());
-        transactionHistory.setSrc(srcAccount);
-        transactionHistory.setDest(destAccount);
+        if (null!=moneyTransfer.getPayer_account_id()) {
+            Account srcAccount = new Account();
+            srcAccount.setId(moneyTransfer.getPayer_account_id());
+            transactionHistory.setSrc(srcAccount);
+        }
+        if (null!=moneyTransfer.getPayee_account_id()) {
+            Account destAccount = new Account();
+            destAccount.setId(moneyTransfer.getPayee_account_id());
+            transactionHistory.setDest(destAccount);
+        }
 
         return transactionHistory;
     }
-
-    private Account getAccountById(Long accountId) {
-        return map_accountId_account.get(accountId);
-    }
-
 }
