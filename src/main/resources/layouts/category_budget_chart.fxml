@@ -23,11 +23,6 @@
                 <DatePicker fx:id="endDatePicker"/>
             </VBox>
         </HBox>
-        <Button HBox.hgrow="NEVER" alignment="BOTTOM_RIGHT" text="Add Category" onAction="#handleAddCategoryButtonClick" >
-            <graphic>
-                <FontIcon iconLiteral="mdi-plus"/>
-            </graphic>
-        </Button>
         <Button HBox.hgrow="NEVER" alignment="BOTTOM_RIGHT" text="Create Chart" onAction="#handleCreateChartButtonClick" >
             <graphic>
                 <FontIcon iconLiteral="mdi-chart-bar"/>
@@ -35,12 +30,31 @@
         </Button>
     </HBox>
 
+    <!-- issue #2 solved: added Clear Categories button -->
+    <HBox maxHeight="70" VBox.vgrow="NEVER" spacing="10">
+        <ScrollPane HBox.hgrow="ALWAYS" fitToWidth="true" hbarPolicy="NEVER" >
+            <FlowPane fx:id="selectedCategoriesPanel" hgap="10" vgap="10" >
+                <padding>
+                    <Insets top="10" left="10" bottom="10" right="10"/>
+                </padding>
+            </FlowPane>
+        </ScrollPane>
 
-    <ScrollPane prefHeight="150" fitToWidth="true" hbarPolicy="NEVER">
-        <FlowPane style="-fx-padding: 10;" fx:id="selectedCategoriesPanel" hgap="10" vgap="10" />
-    </ScrollPane>
+        <VBox  HBox.hgrow="NEVER" spacing="10" alignment="TOP_RIGHT">
+            <Button VBox.vgrow="NEVER" text="Add Category" onAction="#handleAddCategoryButtonClick" prefWidth="200" >
+                <graphic>
+                    <FontIcon iconLiteral="mdi-plus"/>
+                </graphic>
+            </Button>
+            <Button VBox.vgrow="NEVER" text="Clear Categories" onAction="#handleClearCategoriesButtonClick"  prefWidth="200">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-broom"/>
+                </graphic>
+            </Button>
+        </VBox>
+    </HBox>
 
-    <BarChart fx:id="categoryBudgetChart">
+    <BarChart VBox.vgrow="ALWAYS" fx:id="categoryBudgetChart">
         <xAxis>
             <CategoryAxis label="Category"/>
         </xAxis>

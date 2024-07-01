@@ -1,5 +1,5 @@
 package rahulstech.jfx.balancesheet.view;
-import javafx.animation.FadeTransition;
+import javafx.animation.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -8,6 +8,7 @@ import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import rahulstech.jfx.balancesheet.ResourceLoader;
 
+@SuppressWarnings("ALL")
 public class Chip extends HBox {
 
     @SuppressWarnings("FieldMayBeFinal")

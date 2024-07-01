@@ -36,7 +36,7 @@ public class Controller implements Initializable {
         rootProperty.setValue(root);
     }
 
-    public ObjectProperty<Stage> stageProperty() {
+    public ObjectProperty<Stage> windowProperty() {
         return windowProperty;
     }
 

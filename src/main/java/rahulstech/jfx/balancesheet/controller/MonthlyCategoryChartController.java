@@ -8,7 +8,6 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxListCell;
 import javafx.scene.layout.FlowPane;
@@ -18,17 +17,14 @@ import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
-import rahulstech.jfx.balancesheet.util.ViewLauncher;
-import rahulstech.jfx.balancesheet.view.Chip;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("ALL")
-public class MonthlyCategoryChartController extends Controller {
+public class MonthlyCategoryChartController extends BaseCategoryChartController {
 
     private static final String TAG = MonthlyCategoryChartController.class.getSimpleName();
 
@@ -48,11 +44,7 @@ public class MonthlyCategoryChartController extends Controller {
     @FXML
     private BarChart<String, Number> monthlyCategoryChart;
 
-    private HashSet<Category> selectedCategories = new HashSet<>();
-
     private Future<?> chartDataTask;
-
-    private CategoryController categoryController;
 
     @Override
     protected void onInitialize(ResourceBundle res) {
@@ -114,46 +106,13 @@ public class MonthlyCategoryChartController extends Controller {
     }
 
     @FXML
-    private void handleAddCategoryButtonClick() {
-        // For now, just add a new chip with sample text
-        if (null==categoryController) {
-            ViewLauncher launcher = getViewLauncherBuilder()
-                    .setFxml("category.fxml")
-                    .setTitle("Choose Category")
-                    .build().load();
-            categoryController = launcher.getController();
-            categoryController.getCategoryList().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            categoryController.getWindow().setOnCloseRequest(e->{
-                addCategories(categoryController.getCategoryList().getSelectionModel().getSelectedItems());
-            });
-        }
-        categoryController.getWindow().show();
-    }
-
-    private void addCategories(List<Category> categories) {
-        for (Category category : categories) {
-            if (selectedCategories.add(category)) {
-                addCategoryChip(category);
-            }
-        }
-    }
-
-    private void addCategoryChip(Category category) {
-        Chip chip = new Chip(category.getName());
-        chip.setCloseListener(v->{
-            selectedCategories.remove(category);
-        });
-        selectedCategoriesPanel.getChildren().add(chip);
-    }
-
-    @FXML
     private void handleCreateChartButtonClick(ActionEvent event) {
         if (null != chartDataTask) {
             chartDataTask.cancel(true);
         }
         YearMonth startMonth = startMonthComboBox.getValue();
         YearMonth endMonth = endMonthComboBox.getValue();
-        List<Category> categories = selectedCategories.stream().collect(Collectors.toList());
+        List<Category> categories = getSelectedCategories();
         if (categories.isEmpty()) {
             DialogUtil.alertError(getWindow(),"Chart Error","Choose at least one category to create chart");
             return;

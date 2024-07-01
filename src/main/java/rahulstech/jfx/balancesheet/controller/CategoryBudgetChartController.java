@@ -3,30 +3,24 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.FlowPane;
-import javafx.stage.Modality;
+import javafx.scene.layout.*;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.model.CategoryBudgetModel;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
-import rahulstech.jfx.balancesheet.util.ViewLauncher;
-import rahulstech.jfx.balancesheet.view.Chip;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
-public class CategoryBudgetChartController extends Controller {
+public class CategoryBudgetChartController extends BaseCategoryChartController {
 
     private static final String TAG = CategoryBudgetChartController.class.getSimpleName();
 
@@ -44,8 +38,6 @@ public class CategoryBudgetChartController extends Controller {
 
     private Future<?> queryTask;
 
-    private CategoryController categoryController;
-
     @Override
     protected void onInitialize(ResourceBundle res) {
         prepareChart();
@@ -53,11 +45,6 @@ public class CategoryBudgetChartController extends Controller {
 
     private void prepareChart() {
         categoryBudgetChart.setAnimated(false);
-    }
-
-    @FXML
-    private void handleAddCategoryButtonClick(ActionEvent event) {
-        showCategoriesPicker();
     }
 
     @FXML
@@ -139,40 +126,5 @@ public class CategoryBudgetChartController extends Controller {
 
     private void setEndDate(LocalDate date) {
         endDatePicker.setValue(date);
-    }
-
-    private void showCategoriesPicker() {
-        if (null==categoryController) {
-            ViewLauncher launcher = getViewLauncherBuilder()
-                    .setFxml("category.fxml")
-                    .setTitle("Choose Categories")
-                    .setStageModality(Modality.APPLICATION_MODAL)
-                    .build();
-            launcher.load();
-            categoryController = launcher.getController();
-            categoryController.getCategoryList().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            categoryController.getWindow().setOnCloseRequest(e->addCategories(categoryController.getCategoryList().getSelectionModel().getSelectedItems()));
-        }
-        categoryController.getWindow().show();
-    }
-
-    private List<Category> getSelectedCategories() {
-        List<Category> categories = new ArrayList<>();
-        for (Node child : selectedCategoriesPanel.getChildren()) {
-            if (child instanceof Chip) {
-                Category category = (Category) child.getUserData();
-                categories.add(category);
-            }
-        }
-        return categories;
-    }
-
-    private void addCategories(List<Category> categories) {
-        selectedCategoriesPanel.getChildren().clear();
-        for (Category category : categories) {
-            Chip chip = new Chip(category.getName());
-            chip.setUserData(category);
-            selectedCategoriesPanel.getChildren().add(chip);
-        }
     }
 }
