@@ -92,7 +92,29 @@ public class CreateDerivativeController extends Controller{
         Currency taxPrice = (Currency) taxField.getTextFormatter().getValue();
         LocalDate when = dateDatePicker.getValue();
 
-        // TODO: validate
+        StringBuilder message = new StringBuilder();
+        if (null==name || name.isEmpty()) {
+            message.append("no name provided").append("\r\n") ;
+        }
+        if (null==dematAccount) {
+            message.append("no account selected").append("\r\n");
+        }
+        if (volume.compareTo(BigDecimal.ZERO)<=0) {
+            message.append("volume must be a number more than zero").append("\r\n");
+        }
+        if (unitPrice.compareTo(Currency.ZERO)<=0) {
+            message.append("unit price must be a number more than zero").append("\r\n");
+        }
+        if (taxPrice.compareTo(Currency.ZERO)<0) {
+            message.append("tax must be a non negative number").append("\r\n");
+        }
+        if (null==when) {
+            message.append("date not selected");
+        }
+        if (message.length()>0) {
+            DialogUtil.alertError(getWindow(),"Input Error",message.toString());
+            return;
+        }
 
         Derivative derivative = new Derivative();
         derivative.setName(name);
