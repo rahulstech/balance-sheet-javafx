@@ -16,9 +16,9 @@
     <Label text="Balance" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
     <TextField fx:id="balanceField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-    <Button text="Save" onAction="#handleSave" GridPane.columnIndex="1" GridPane.rowIndex="2">
+    <Button text="Save" onAction="#handleSave" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="base-button">
         <graphic>
-            <FontIcon iconLiteral="mdi-content-save"/>
+            <FontIcon iconLiteral="mdi-content-save" styleClass="control-icon"/>
         </graphic>
     </Button>
 </GridPane>

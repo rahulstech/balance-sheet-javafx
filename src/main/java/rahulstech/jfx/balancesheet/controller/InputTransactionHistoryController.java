@@ -8,10 +8,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
 import org.kordamp.ikonli.javafx.FontIcon;
 import rahulstech.jfx.balancesheet.concurrent.TransactionHistorySaveTask;
 import rahulstech.jfx.balancesheet.database.entity.Account;
@@ -21,6 +20,7 @@ import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.view.Chip;
 
@@ -28,8 +28,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 
 @SuppressWarnings({"ALL","unchecked"})
@@ -106,21 +104,28 @@ public class InputTransactionHistoryController extends Controller {
 
     public void setOldHistory(TransactionHistory oldHistory) {
         this.oldHistory = oldHistory;
+        TransactionType type = oldHistory.getType();
         datePicker.setValue(oldHistory.getWhen());
+        datePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
         ((TextFormatter<Currency>) amountField.getTextFormatter()).setValue(oldHistory.getAmount());
         transactionTypeCombo.getSelectionModel().select(oldHistory.getType());
-        setSrcAccount(oldHistory.getSrc());
-        setDestAccount(oldHistory.getDest());
+        if (type==TransactionType.DEPOSIT) {
+            // set in destAccount input
+            setDestAccount(oldHistory.getSrc());
+        }
+        else if (type==TransactionType.WITHDRAW) {
+            // set in srcAccount input
+            setSrcAccount(oldHistory.getSrc());
+        }
+        else {
+            setSrcAccount(oldHistory.getSrc());
+            setDestAccount(oldHistory.getDest());
+        }
         descriptionField.setText(oldHistory.getDescription());
         addCategories(oldHistory.getCategories());
         if (null!=oldHistory.getTax()) {
             ((TextFormatter<Currency>) taxField.getTextFormatter()).setValue(oldHistory.getTax());
-            if (oldHistory.isTaxSrc()){
-                taxGroup.selectToggle(taxSrc);
-            }
-            else {
-                taxGroup.selectToggle(taxDest);
-            }
+            setTaxChoiceForType(type);
         }
 
         setSrcAccountDisabled(true);
@@ -140,6 +145,7 @@ public class InputTransactionHistoryController extends Controller {
         taxGroup = setupTaxGroup();
 
         datePicker.setValue(LocalDate.now());
+        datePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
 
         // Initialize the combo boxes with data
         transactionTypeCombo.getItems().setAll(TransactionType.values());
@@ -156,20 +162,25 @@ public class InputTransactionHistoryController extends Controller {
     }
 
     private void onChangeTransactionType(TransactionType newType) {
-        boolean isTransfer = newType == TransactionType.TRANSFER;
-        if (isTransfer) {
+        if (newType==TransactionType.DEPOSIT) {
+            // DEPOSITE only destAccount enabled
+            // and taxDest checked and both tax radio ddisbaled,
+            setSrcAccountDisabled(true);
             setDestAccountDisabled(false);
-            taxGroup.selectToggle(taxSrc);
-            taxSrc.setDisable(false);
-            taxDest.setDisable(false);
+        }
+        else if (newType==TransactionType.WITHDRAW) {
+            // WITHDRAW only srcAccount enabled
+            // and taxSrc checked and both tax radios disabled,
+            setSrcAccountDisabled(false);
+            setDestAccountDisabled(true);
         }
         else {
-            setDestAccountDisabled(true);
-            taxGroup.selectToggle(taxSrc);
-            taxSrc.setDisable(true);
-            taxDest.setDisable(true);
+            // TRANSFER both srcAccount and destAccount enabled
+            // and taxSrc and taxDest enable and taxSrc is checked
+            setSrcAccountDisabled(false);
+            setDestAccountDisabled(false);
         }
-
+        setTaxChoiceForType(newType);
     }
 
     private ToggleGroup setupTaxGroup() {
@@ -188,35 +199,30 @@ public class InputTransactionHistoryController extends Controller {
         buttonAddDestAccount.setDisable(disabled);
     }
 
+    private void setTaxChoiceForType(TransactionType type) {
+        if (type==TransactionType.DEPOSIT) {
+            // DEPOSITE taxDest checked and both tax radio ddisbaled,
+            taxGroup.selectToggle(taxDest);
+            taxSrc.setDisable(true);
+            taxDest.setDisable(true);
+        }
+        else if (type==TransactionType.WITHDRAW) {
+            // WITHDRAW taxSrc checked and both tax radios disabled,
+            taxGroup.selectToggle(taxSrc);
+            taxSrc.setDisable(true);
+            taxDest.setDisable(true);
+        }
+        else {
+            // TRANSFER taxSrc and taxDest enable and taxSrc is checked
+            taxGroup.selectToggle(taxSrc);
+            taxSrc.setDisable(false);
+            taxDest.setDisable(false);
+        }
+    }
+
     private void setupNumericTextFormater() {
-        Pattern validEditingState = Pattern.compile("^-?\\d*(\\.\\d{0,2})?$");
-
-        UnaryOperator<TextFormatter.Change> filter = change -> {
-            String text = change.getControlNewText();
-            if (validEditingState.matcher(text).matches()) {
-                return change;
-            } else {
-                return null;
-            }
-        };
-
-        StringConverter<Currency> converter = new StringConverter<Currency>() {
-            @Override
-            public String toString(Currency number) {
-                return null == number ? "0" : number.toString();
-            }
-
-            @Override
-            public Currency fromString(String s) {
-                return null==s || s.isEmpty() ? null : Currency.from(s);
-            }
-        };
-
-        TextFormatter<Currency> amountTextFormatter = new TextFormatter<>(converter, null, filter);
-        TextFormatter<Currency> taxTextFormatter = new TextFormatter<>(converter,null,filter);
-
-        amountField.setTextFormatter(amountTextFormatter);
-        taxField.setTextFormatter(taxTextFormatter);
+        amountField.setTextFormatter(TextUtil.createCurrencyTextFormater());
+        taxField.setTextFormatter(TextUtil.createCurrencyTextFormater());
     }
 
     private Account getSelectedSrcAccount() {
@@ -255,15 +261,31 @@ public class InputTransactionHistoryController extends Controller {
             TransactionHistory transactionHistory = null == this.oldHistory ? new  TransactionHistory() : this.oldHistory;
             transactionHistory.setWhen(date);
             transactionHistory.setAmount(amount);
-            transactionHistory.setSrc(srcAccount);
-            if (transactionType == TransactionType.TRANSFER) {
-                transactionHistory.setDest(destAccount);
-            }
             transactionHistory.setType(transactionType);
             transactionHistory.setDescription(description);
             transactionHistory.setCategories(categories);
             transactionHistory.setTax(tax);
-            transactionHistory.setTaxSrc(isTaxSrc);
+            // the input account and entity account have different naming
+            // Note: in case of DEPOsITE AND WITHDRAW taxAtSrc = true always
+            // becuase only one account involved in those cases. So, if tax is
+            // provided then tax will be charges from that account obviously.
+            // for TRANSFER both accounts are available therefore it depends on user's choice
+            if (transactionType==TransactionType.DEPOSIT) {
+                // DEPOSITE taks input destAccount
+                transactionHistory.setSrc(destAccount);
+                transactionHistory.setTaxSrc(null!=tax);
+            }
+            else if (transactionType==TransactionType.WITHDRAW) {
+                // WITDRAW takes input srcAccount
+                transactionHistory.setSrc(srcAccount);
+                transactionHistory.setTaxSrc(null!=tax);
+            }
+            else {
+                // TRANSFER taskes both as it is
+                transactionHistory.setSrc(srcAccount);
+                transactionHistory.setDest(destAccount);
+                transactionHistory.setTaxSrc(isTaxSrc);
+            }
             saveHistory(transactionHistory);
         } else {
             DialogUtil.alertError(getWindow(),"Error","Some inputs contain error.");
@@ -305,7 +327,7 @@ public class InputTransactionHistoryController extends Controller {
             ViewLauncher launcher = getViewLauncherBuilder()
                     .setFxml("accounts_list.fxml")
                     .setTitle("Choose Source Account")
-                    .setStageModality(Modality.APPLICATION_MODAL)
+                    .setStageStyle(StageStyle.UTILITY)
                     .build().load();
             AccountsListController controller = launcher.getController();
             controller.getAccountListView().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -334,7 +356,7 @@ public class InputTransactionHistoryController extends Controller {
             ViewLauncher launcher = getViewLauncherBuilder()
                     .setFxml("accounts_list.fxml")
                     .setTitle("Choose Destination Account")
-                    .setStageModality(Modality.APPLICATION_MODAL)
+                    .setStageStyle(StageStyle.UTILITY)
                     .build().load();
             AccountsListController controller = launcher.getController();
             controller.getAccountListView().getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

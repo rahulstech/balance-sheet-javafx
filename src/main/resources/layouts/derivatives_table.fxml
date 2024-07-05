@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="rahulstech.jfx.balancesheet.controller.DerivativeTableController" spacing="10">
+    <padding>
+        <Insets top="10" left="10" right="10" bottom="10"/>
+    </padding>
+
+    <stylesheets>
+        <URL value="@../styles/theme.css"/>
+    </stylesheets>
+
+    <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="16">
+        <padding>
+            <Insets top="8" bottom="8" right="8"/>
+        </padding>
+        <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6" styleClass="card">
+            <Label text="Total Investment" styleClass="text-body"/>
+            <Label VBox.vgrow="ALWAYS" fx:id="totalInvestedValueLabel" wrapText="true" styleClass="text-title-large"/>
+        </VBox>
+        <VBox HBox.hgrow="ALWAYS" styleClass="card" alignment="CENTER" spacing="6">
+            <Label text="Profit after Tax" styleClass="text-body"/>
+            <Label fx:id="realProfitLabel" wrapText="true" textAlignment="CENTER" styleClass="text-title-large"/>
+        </VBox>
+        <VBox HBox.hgrow="ALWAYS" styleClass="card" alignment="CENTER" spacing="6">
+            <Label text="Unrealized P/L (Net Change %)" styleClass="text-body"/>
+            <Label fx:id="totalUnrealizedPLLabel" wrapText="true" textAlignment="CENTER" styleClass="text-title-large"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER">
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+            <VBox spacing="10">
+                <TextField fx:id="searchBox" promptText="search" maxWidth="200" />
+            </VBox>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button styleClass="base-button" fx:id="buttonInfo" text="View Transactions" onAction="#handleInfoButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-information" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+            <Button styleClass="base-button,button-error" fx:id="buttonDeleteSelected" text="Delete Selected" onAction="#handleDeleteDerivativesButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+            <Button styleClass="base-button" fx:id="buttonSaveChanged" text="Save Changes" onAction="#handleSaveChangesButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-content-save" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+                <Button styleClass="base-button" text="Refresh" onAction="#handleRefreshButtonClicked">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi-refresh" styleClass="control-icon"/>
+                    </graphic>
+                </Button>
+                <Button styleClass="base-button,button-success" text="Buy Derivative" onAction="#handleBuyDerivativeButtonClicked">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
+                    </graphic>
+                </Button>
+        </HBox>
+    </HBox>
+
+    <TableView editable="true" fx:id="derivativesTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="160"/>
+            <TableColumn fx:id="volumeColumn" text="Volume" prefWidth="100"/>
+            <TableColumn fx:id="avgBuyPriceColumn" text="Buy Price" prefWidth="140"/>
+            <TableColumn fx:id="currentUnitPriceColumn" text="Current Price" prefWidth="140"/>
+            <TableColumn fx:id="currentValueColumn" text="Current Value" prefWidth="180"/>
+            <TableColumn fx:id="totalUnrealizedPLColumn" text="P&amp;L" prefWidth="150"/>
+            <TableColumn fx:id="netChangeColumn" text="Net Change" prefWidth="125"/>
+            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
+        </columns>
+    </TableView>
+
+</VBox>

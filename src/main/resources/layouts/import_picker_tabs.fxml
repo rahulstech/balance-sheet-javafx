@@ -7,10 +7,19 @@
 
 <?import javafx.scene.layout.VBox?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox prefWidth="600" prefHeight="400" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <HBox alignment="TOP_RIGHT" style="-fx-padding: 12px 16px;" spacing="10">
-        <Button prefWidth="140" text="Cancel" onAction="#handleCancel"/>
-        <Button prefWidth="230"  text="Add Selected Only" onAction="#handleAddSelected"/>
+        <Button styleClass="base-button" prefWidth="140" text="Cancel" onAction="#handleCancel">
+            <graphic>
+                <FontIcon iconLiteral="mdi-close" styleClass="control-icon"/>
+            </graphic>
+        </Button>
+        <Button styleClass="base-button" prefWidth="230"  text="Add Selected Only" onAction="#handleAddSelected">
+            <graphic>
+                <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
+            </graphic>
+        </Button>
     </HBox>
 
     <TabPane prefWidth="500" prefHeight="400" HBox.hgrow="ALWAYS">

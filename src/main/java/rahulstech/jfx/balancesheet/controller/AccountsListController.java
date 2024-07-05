@@ -4,8 +4,9 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
-import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.stage.StageStyle;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
@@ -13,7 +14,6 @@ import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.util.ViewLoader;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +36,13 @@ public class AccountsListController extends Controller {
 
     @Override
     protected void onInitialize(ResourceBundle res) {
+        accountListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        accountListView.setOnMouseClicked(e->{
+            if (e.getButton()== MouseButton.PRIMARY && e.getClickCount()==2){
+                Account account = accountListView.getSelectionModel().getSelectedItem();
+                handleEditAccount(account);
+            }
+        });
         accountListView.setCellFactory(listView->{
             return new ListCell<Account>() {
                     @Override
@@ -49,7 +56,6 @@ public class AccountsListController extends Controller {
                             setGraphic(loader.getRoot());
                             AccountListItemController controller = loader.getController();
                             controller.setAccount(account);
-                            setContextMenu(createContextMenu(account));
                         }
                     }
                 };
@@ -71,21 +77,6 @@ public class AccountsListController extends Controller {
         return accountListView;
     }
 
-    private ContextMenu createContextMenu(Account account) {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem edit = new MenuItem("Edit");
-        edit.setGraphic(new FontIcon("mdi-pencil"));
-        edit.setOnAction(e->handleEditAccount(account));
-
-        MenuItem delete = new MenuItem("Delete");
-        delete.setGraphic(new FontIcon("mdi-delete"));
-        delete.setOnAction(e->handleDeleteAccount(account));
-
-        menu.getItems().addAll(edit,delete);
-        return menu;
-    }
-
     private void handleEditAccount(Account account) {
         ViewLauncher launcher = getViewLauncherBuilder()
                 .setFxml("account_input.fxml")
@@ -99,15 +90,15 @@ public class AccountsListController extends Controller {
         controller.setAccount(account);
     }
 
-    private void handleDeleteAccount(Account account) {
+    private void handleDeleteAccounts(List<Account> accounts) {
         DialogUtil.alertConfirmation(getWindow(),
                 "Warning","Selected account will be deleted permanently. Are you sure to proceed?",
                 "Delete",()->{
-                    Task<Boolean> task = TaskUtils.deleteAccount(Collections.singletonList(account),
-                            t-> accountListView.getItems().remove(account), t->{
-                        Log.error(TAG,"delete accounts",t.getException());
-                        DialogUtil.alertError(getWindow(),"Error","Account not deleted.");
-                    });
+                    Task<Boolean> task = TaskUtils.deleteAccount(accounts,
+                            t-> accountListView.getItems().remove(accounts), t->{
+                                Log.error(TAG,"delete accounts",t.getException());
+                                DialogUtil.alertError(getWindow(),"Error","Account not deleted.");
+                            });
                     getApp().getAppExecutor().
                             execute(task);
                 },"Cancel",null);
@@ -122,6 +113,7 @@ public class AccountsListController extends Controller {
                 .setWidth(400)
                 .setHeight(200)
                 .setStageModality(Modality.APPLICATION_MODAL)
+                .setStageStyle(StageStyle.UTILITY)
                 .build().load();
         launcher.getWindow().show();
     }
@@ -145,6 +137,25 @@ public class AccountsListController extends Controller {
     private void setAccounts(List<Account> values) {
         accountListView.getItems().clear();
         accountListView.getItems().addAll(values);
+    }
+
+    @FXML
+    private void handleDeleteButtonClicked(ActionEvent event) {
+        List<Account> accounts = accountListView.getSelectionModel().getSelectedItems();
+        if (accounts.isEmpty()) {
+            return;
+        }
+        handleDeleteAccounts(accounts);
+    }
+
+    @FXML
+    private void handleEditButtonClicked() {
+        if (accountListView.getSelectionModel().getSelectedItems().size()!=1) {
+            Log.debug(TAG,"either multiple account or nothing selected, can not perform edit");
+            return;
+        }
+        Account account = accountListView.getSelectionModel().getSelectedItem();
+        handleEditAccount(account);
     }
 }
 

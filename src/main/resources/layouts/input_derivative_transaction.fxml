@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="rahulstech.jfx.balancesheet.controller.InputDerivativeTransactionController"
+      spacing="24">
+
+    <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+    <HBox alignment="TOP_RIGHT">
+        <Button styleClass="base-button" text="Save" onAction="#handleSaveButtonClicked" alignment="TOP_RIGHT">
+            <graphic>
+                <FontIcon iconLiteral="mdi-content-save" styleClass="control-icon"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <GridPane vgap="16" hgap="10">
+
+        <columnConstraints>
+            <ColumnConstraints/>
+            <ColumnConstraints prefWidth="260" maxWidth="260"/>
+            <ColumnConstraints/>
+            <ColumnConstraints prefWidth="260" maxWidth="260"/>
+        </columnConstraints>
+
+        <rowConstraints>
+            <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints maxHeight="100"/>
+        </rowConstraints>
+
+        <Label text="Date:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="whenDatePicker" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Volume:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="volumeField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+
+        <Label text="Price:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+        <TextField fx:id="priceField" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+
+        <Label text="Tax:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="taxField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Description:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextArea fx:id="descriptionArea" wrapText="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+    </GridPane>
+</VBox>

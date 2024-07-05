@@ -6,20 +6,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Budget;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.view.Chip;
 
 import java.time.LocalDate;
 import java.util.ResourceBundle;
-import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 @SuppressWarnings({"ALL","unchecked"})
 public class InputBudgetController extends Controller {
@@ -51,7 +49,9 @@ public class InputBudgetController extends Controller {
     public void setBudget(Budget selected) {
         this.oldBudget = selected;
         startDatePicker.setValue(selected.getStartDate());
+        startDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
         endDatePicker.setValue(selected.getEndDate());
+        endDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
         ((TextFormatter<Currency>)amountField.getTextFormatter()).setValue(selected.getAmount());
         descriptionField.setText(selected.getDescription());
         addCategory(selected.getCategory());
@@ -67,33 +67,7 @@ public class InputBudgetController extends Controller {
     }
 
     private void setupNumericTextFormater() {
-        Pattern validEditingState = Pattern.compile("^-?\\d*(\\.\\d{0,2})?$");
-
-        UnaryOperator<TextFormatter.Change> filter = change -> {
-            String text = change.getControlNewText();
-            if (validEditingState.matcher(text).matches()) {
-                return change;
-            } else {
-                return null;
-            }
-        };
-
-        StringConverter<Currency> converter = new StringConverter<Currency>() {
-            @Override
-            public String toString(Currency number) {
-                return null == number ? "0" : number.toString();
-            }
-
-            @Override
-            public Currency fromString(String s) {
-                return null==s || s.isEmpty() ? null : Currency.from(s);
-            }
-        };
-
-        TextFormatter<Currency> amountTextFormatter = new TextFormatter<>(converter, null, filter);
-        TextFormatter<Currency> taxTextFormatter = new TextFormatter<>(converter,null,filter);
-
-        amountField.setTextFormatter(amountTextFormatter);
+        amountField.setTextFormatter(TextUtil.createCurrencyTextFormater());
     }
 
     @FXML

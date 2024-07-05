@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @DatabaseTable(tableName = "histories")
 public class TransactionHistory {
 
-    @DatabaseField(generatedId = true)
+    @DatabaseField(generatedId = true,allowGeneratedIdInsert = true)
     private long id;
 
     @DatabaseField(canBeNull = false, persisterClass = DbTypeLocalDate.class)
@@ -148,5 +148,21 @@ public class TransactionHistory {
 
     public void setTaxSrc(boolean taxSrc) {
         this.taxSrc = taxSrc;
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionHistory{" +
+                "id=" + id +
+                ", when=" + when +
+                ", amount=" + amount +
+                ", src=" + src +
+                ", dest=" + dest +
+                ", type=" + type +
+                ", description='" + description + '\'' +
+                ", tax=" + tax +
+                ", taxSrc=" + taxSrc +
+                ", historyCategories=" + historyCategories +
+                '}';
     }
 }

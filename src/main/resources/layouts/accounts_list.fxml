@@ -3,30 +3,43 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.AccountsListController">
-    <top>
-        <VBox spacing="16" style="-fx-padding: 12px 10px">
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Search account" />
-                <Button text="New Account" onAction="#handleAddAccount">
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.AccountsListController" spacing="10">
+    <padding>
+        <Insets top="10" left="10" right="10" bottom="10"/>
+    </padding>
+        <HBox spacing="10">
+            <HBox spacing="8" HBox.hgrow="NEVER">
+                <TextField HBox.hgrow="ALWAYS" fx:id="searchField" promptText="Search account" />
+            </HBox>
+            <HBox HBox.hgrow="ALWAYS" spacing="10" alignment="TOP_RIGHT">
+                <Button styleClass="base-button" text="Edit Selected" onAction="#handleEditButtonClicked">
                     <graphic>
-                        <FontIcon iconLiteral="mdi-plus"/>
+                        <FontIcon iconLiteral="mdi-pencil" styleClass="control-icon"/>
                     </graphic>
                 </Button>
-                <Button text="Refresh" onAction="#handleRefresh">
+                <Button styleClass="base-button,button-error" text="Delete Selected" onAction="#handleDeleteButtonClicked">
                     <graphic>
-                        <FontIcon iconLiteral="mdi-refresh"/>
+                        <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
+                    </graphic>
+                </Button>
+                <Button styleClass="base-button" text="Refresh" onAction="#handleRefresh">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi-refresh" styleClass="control-icon"/>
+                    </graphic>
+                </Button>
+                <Button styleClass="base-button,button-success" text="New Account" onAction="#handleAddAccount">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
                     </graphic>
                 </Button>
             </HBox>
-        </VBox>
-    </top>
-    <center>
-        <ListView fx:id="accountListView" />
-    </center>
-</BorderPane>
+        </HBox>
+
+        <ListView VBox.vgrow="ALWAYS" fx:id="accountListView" />
+</VBox>
 

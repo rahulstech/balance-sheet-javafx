@@ -1,0 +1,6 @@
+.card {
+    -fx-padding: .75em 1em 0.75em 1em; /* 12px 16px 12px 16px */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4); /* Shadow */
+    -fx-background-color: surface;
+    -fx-background-radius: 0.75em;
+}

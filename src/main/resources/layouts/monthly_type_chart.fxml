@@ -27,9 +27,9 @@
                 <ComboBox fx:id="transactionTypeComboBox" prefWidth="120.0"/>
             </VBox>
         </HBox>
-        <Button HBox.hgrow="NEVER" alignment="TOP_RIGHT" fx:id="createChartButton" text="Create Chart">
+        <Button styleClass="base-button" HBox.hgrow="NEVER" alignment="TOP_RIGHT" fx:id="createChartButton" text="Create Chart">
             <graphic>
-                <FontIcon iconLiteral="mdi-chart-bar"/>
+                <FontIcon iconLiteral="mdi-chart-bar" styleClass="control-icon"/>
             </graphic>
         </Button>
     </HBox>

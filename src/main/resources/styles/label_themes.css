@@ -1,3 +1,54 @@
 .root {
-    -fx-font-size: 1.125em;
+    -fx-font-size: 0.9984em; /* 16sp */
+    -fx-font-color: onSurface;
+    -fx-font-family: 'SansSerif';
+    -fx-font-style: normal;
+    -fx-graphic-text-gap: 0.5em;
+}
+
+.label > .control-icon {
+    -fx-icon-color: onSurface;
+    -fx-icon-size: 20px;
+}
+
+.text-title-large {
+    -fx-font-size: 1.4976em; /* 24sp */
+    -fx-letter-spacing: 0;
+}
+
+.text-body {
+    -fx-font-size: 0.8736em; /* 14sp */
+    -fx-letter-spacing: 0;
+    -fx-font-color: onSurface;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.2496em;
+}
+
+.text-credit {
+    -fx-text-fill: success;
+    -fx-font-weight: bold;
+}
+
+.text-debit,
+.table-row-cell > .text-debit {
+    -fx-text-fill: error;
+    -fx-font-weight: bold;
+}
+
+.text-transfer,
+.table-row-cell > .text-transfer {
+    -fx-text-fill: neutral;
+    -fx-font-weight: bold;
+}
+
+ .table-row-cell:selected > .text-credit {
+    -fx-text-fill: onSuccess;
+}
+
+.table-row-cell:selected > .text-debit {
+    -fx-text-fill: onError;
+}
+
+.table-row-cell:selected > .text-transfer {
+    -fx-text-fill: onNeutral;
 }

@@ -10,6 +10,7 @@ import rahulstech.jfx.balancesheet.database.dao.*;
 import rahulstech.jfx.balancesheet.database.entity.*;
 import rahulstech.jfx.balancesheet.database.exception.DatabaseException;
 import rahulstech.jfx.balancesheet.database.internal.DBVersion;
+import rahulstech.jfx.balancesheet.database.migration.MIGRATION_2_3;
 import rahulstech.jfx.balancesheet.database.migration.Migration;
 import rahulstech.jfx.balancesheet.util.Log;
 
@@ -17,7 +18,6 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -26,7 +26,7 @@ public class BalancesheetDb {
 
     private static final String TAG = BalancesheetDb.class.getSimpleName();
 
-    private static final long DB_VERSION = 2;
+    private static final long DB_VERSION = 3;
 
     private static final String DB_FILE_NAME = "balance_sheet.db3";
 
@@ -38,14 +38,17 @@ public class BalancesheetDb {
 
     private static final Class<?>[] ENTITIES = new Class<?>[]{
             Account.class, Category.class,
-            TransactionHistory.class, HistoryCategory.class, Budget.class
+            TransactionHistory.class, HistoryCategory.class, Budget.class,
+            Derivative.class, DerivativeTransaction.class
     };
 
-    private final List<Migration> MIGRATIONS = Collections.emptyList();
+    private final List<Migration> MIGRATIONS;
 
     private final List<DBCallback> CALLBACKS;
 
     private static BalancesheetDb INSTANCE = null;
+
+    private static boolean LOG_VERBOSE = false;
 
     private ConnectionSource connectionSource;
 
@@ -59,9 +62,18 @@ public class BalancesheetDb {
 
     private BudgetDao budgetDao;
 
+    private DerivativeDao derivativeDao;
+
+    private DerivativeTransactionDao derivativeTransactionsDao;
+
+    private ReportDao reportDao;
+
     private BalancesheetDb() {
         CALLBACKS = Arrays.asList(
                 ADD_DEFAULT_CATEGORIES
+        );
+        MIGRATIONS = Arrays.asList(
+                new MIGRATION_2_3()
         );
         initialize(null==DB_DIR ? DEFAULT_DB_DIR : DB_DIR);
     }
@@ -91,6 +103,18 @@ public class BalancesheetDb {
 
     public BudgetDao getBudgetDao() {
         return budgetDao;
+    }
+
+    public DerivativeDao getDerivativeDao() {
+        return derivativeDao;
+    }
+
+    public DerivativeTransactionDao getDerivativeTransactionsDao() {
+        return derivativeTransactionsDao;
+    }
+
+    public ReportDao getReportDao() {
+        return reportDao;
     }
 
     public long getCurrentDBVersion() {
@@ -135,15 +159,18 @@ public class BalancesheetDb {
         DB_DIR = db_dir;
     }
 
+    public static void setLogging(boolean logVerbose) {
+        LOG_VERBOSE = logVerbose;
+    }
+
     private void initialize(File dir) {
         ConnectionSource source = null;
         boolean initialized = false;
         try {
             // set ormlite log level
-            com.j256.ormlite.logger.Level logLevel = com.j256.ormlite.logger.Level.ERROR;
+            com.j256.ormlite.logger.Level logLevel = LOG_VERBOSE ? com.j256.ormlite.logger.Level.TRACE
+                    : com.j256.ormlite.logger.Level.INFO ;
             com.j256.ormlite.logger.Logger.setGlobalLogLevel(logLevel);
-
-            // TODO: update logging mechanism so that ormlite logs are added to app log file
 
             // create connection source
             File db_file = new File(dir,DB_FILE_NAME);
@@ -228,12 +255,18 @@ public class BalancesheetDb {
         this.chartDao = new ChartDao(source);
         this.categoryDao = new CategoryDao(source);
         this.budgetDao = new BudgetDao(source);
+        this.derivativeDao = new DerivativeDao(source);
+        this.derivativeTransactionsDao = new DerivativeTransactionDao(source);
+        this.reportDao = new ReportDao(source);
     }
 
+    // TODO: use shortest path algorithm, like Dijkstra's Algorithm, for findiing minimum steps migration
+    // minimum steps migrations means, suppose oldVersion=3 and newVersion=6 and available migrations are
+    // 3->4, 4->5, 5->6 and 3->6. So, the minimum steps migration will choose 3->6 over 3->4->5->6.
     private void applyMigrations(final ConnectionSource source, long oldVersion, long newVersion, final List<Migration> migrations) throws Exception {
         TransactionManager.callInTransaction(source,()->{
             if (migrations.isEmpty()) {
-                throw new SQLException("db version changed from="+oldVersion+" to="+newVersion+" but to migration performed");
+                throw new DatabaseException("db version changed from="+oldVersion+" to="+newVersion+" but no migration provided");
             }
             boolean isMigrationPerformed = false;
             for (Migration migration : migrations) {
@@ -243,7 +276,7 @@ public class BalancesheetDb {
                 }
             }
             if (!isMigrationPerformed) {
-                throw new SQLException("db version changed from="+oldVersion+" to="+newVersion+" but to migration performed");
+                throw new DatabaseException("db version changed from="+oldVersion+" to="+newVersion+" but no migration performed");
             }
             return null;
         });

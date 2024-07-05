@@ -4,12 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 @SuppressWarnings("ALL")
 public class HistoryFilterMiscController extends Controller {
+
     public enum OrderBy {
         AMOUNT_ASC("Amount Ascending"),
         AMOUNT_DESC("Amount Descending"),
@@ -44,10 +46,13 @@ public class HistoryFilterMiscController extends Controller {
         // Add items to the typeComboBox
         typeComboBox.getItems().addAll(TransactionType.values());
         orderByComboBox.getItems().addAll(OrderBy.values());
+        startDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
+        endDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
     }
 
     public void reset() {
         startDatePicker.setValue(LocalDate.now());
+        startDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
         endDatePicker.setValue(LocalDate.now());
         typeComboBox.getSelectionModel().selectFirst();
         orderByComboBox.getSelectionModel().selectFirst();

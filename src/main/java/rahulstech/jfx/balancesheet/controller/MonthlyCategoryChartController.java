@@ -4,23 +4,28 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxListCell;
 import javafx.scene.layout.FlowPane;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.model.MonthlyCategoryModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
+import rahulstech.jfx.balancesheet.util.ChartUtil;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
@@ -77,8 +82,7 @@ public class MonthlyCategoryChartController extends BaseCategoryChartController 
             data.setYValue(amount.getValue());
             series.getData().add(data);
 
-            Tooltip tooltip = new Tooltip(amount.toString());
-            Tooltip.install(data.getNode(),tooltip);
+            setChartIndicator(data.getNode(),TextUtil.prettyPrintCurrency(amount));
 
             Currency sum = category_sum.getOrDefault(category,Currency.ZERO);
             Long count = category_count.getOrDefault(category,0L);
@@ -100,9 +104,12 @@ public class MonthlyCategoryChartController extends BaseCategoryChartController 
             data.setYValue(average.getValue());
             series.getData().add(data);
 
-            Tooltip tooltip = new Tooltip(average.toString());
-            Tooltip.install(data.getNode(),tooltip);
+            setChartIndicator(data.getNode(), TextUtil.prettyPrintCurrency(average));
         }
+    }
+
+    private void setChartIndicator(Node node, String text) {
+        ChartUtil.setChartIndicator(node,text);
     }
 
     @FXML

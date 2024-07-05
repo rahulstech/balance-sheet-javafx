@@ -10,18 +10,18 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
     <HBox alignment="TOP_RIGHT" spacing="10">
-        <Button text="Save" onAction="#handleSave">
+        <Button styleClass="base-button" text="Save" onAction="#handleSave">
             <graphic>
-                <FontIcon iconLiteral="mdi-content-save"/>
+                <FontIcon iconLiteral="mdi-content-save" styleClass="control-icon"/>
             </graphic>
         </Button>
     </HBox>
     <GridPane hgap="10" vgap="10">
         <Label text="Category:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <AnchorPane fx:id="pickedCategory" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <Button text="Choose Category" onAction="#handleChooseCategory" GridPane.rowIndex="0" GridPane.columnIndex="3">
+        <Button styleClass="base-button" text="Choose Category" onAction="#handleChooseCategory" GridPane.rowIndex="0" GridPane.columnIndex="3">
             <graphic>
-                <FontIcon iconLiteral="mdi-plus"/>
+                <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
             </graphic>
         </Button>
 

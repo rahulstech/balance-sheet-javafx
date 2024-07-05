@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.FlowPane;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.view.Chip;
 
 import java.time.LocalDate;
@@ -33,6 +34,8 @@ public class ImportMiscTabController extends Controller {
     @Override
     protected void onInitialize(ResourceBundle res) {
         resetImportOptions();
+        startDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
+        endDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
     }
 
     @FXML

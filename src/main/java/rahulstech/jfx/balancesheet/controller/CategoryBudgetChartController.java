@@ -3,16 +3,18 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.*;
+import javafx.scene.layout.FlowPane;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.model.CategoryBudgetModel;
+import rahulstech.jfx.balancesheet.util.ChartUtil;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -40,6 +42,8 @@ public class CategoryBudgetChartController extends BaseCategoryChartController {
 
     @Override
     protected void onInitialize(ResourceBundle res) {
+        startDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
+        endDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
         prepareChart();
     }
 
@@ -99,17 +103,18 @@ public class CategoryBudgetChartController extends BaseCategoryChartController {
             dataCatrgory.setYValue(item.getCategoryTotalAmount().getValue());
             seriesCategory.getData().add(dataCatrgory);
 
-            Tooltip tooltipCategory = new Tooltip(item.getCategoryTotalAmount().toString());
-            Tooltip.install(dataCatrgory.getNode(),tooltipCategory);
-
             XYChart.Data<String,Number> dataBudget = new XYChart.Data<>();
             dataBudget.setXValue(item.getCategoryName());
             dataBudget.setYValue(item.getBudgetTotalAmount().getValue());
             seriesBudget.getData().add(dataBudget);
 
-            Tooltip tooltipBudget = new Tooltip(item.getBudgetTotalAmount().toString());
-            Tooltip.install(dataBudget.getNode(),tooltipBudget);
+            setChartIndicator(dataCatrgory.getNode(),TextUtil.prettyPrintCurrency(item.getCategoryTotalAmount()));
+            setChartIndicator(dataBudget.getNode(),TextUtil.prettyPrintCurrency(item.getBudgetTotalAmount()));
         }
+    }
+
+    private void setChartIndicator(Node node, String text) {
+        ChartUtil.setChartIndicator(node,text);
     }
 
     private void setStartDate(LocalDate date) {

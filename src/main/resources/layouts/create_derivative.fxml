@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.control.DatePicker?>
+<VBox prefWidth="650" xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.CreateDerivativeController" spacing="16">
+
+    <padding>
+        <Insets top="18" bottom="18" left="24" right="24"/>
+    </padding>
+
+    <FlowPane alignment="TOP_RIGHT">
+        <Button styleClass="base-button" text="Save" onAction="#saveButtonClicked">
+            <graphic>
+                <FontIcon iconLiteral="mdi-content-save" styleClass="control-icon" />
+            </graphic>
+        </Button>
+    </FlowPane>
+
+    <GridPane hgap="16" vgap="16" columnConstraints="" >
+
+        <columnConstraints>
+            <ColumnConstraints prefWidth="105" maxWidth="160" />
+            <ColumnConstraints prefWidth="320" maxWidth="320"/>
+            <ColumnConstraints prefWidth="190" maxWidth="190"/>
+        </columnConstraints>
+
+        <rowConstraints>
+            <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints maxHeight="80"/>
+        </rowConstraints>
+
+        <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <!-- Placeholder for Account Selection -->
+        <Label text="Account:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <FlowPane fx:id="accountFlowPane" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Button styleClass="base-button" text="Add Account" onAction="#addAccountButtonClicked" GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <graphic>
+                <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
+            </graphic>
+        </Button>
+
+        <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <TextArea fx:id="descriptionField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+    </GridPane>
+
+    <Line endX="602"/>
+
+    <GridPane hgap="16" vgap="16">
+
+        <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <DatePicker fx:id="dateDatePicker"  GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <Label text="Volume:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="volumnField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <Label text="Unit Price:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+        <TextField fx:id="unitPriceField" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+        <Label text="Tax:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <TextField fx:id="taxField" GridPane.columnSpan="2" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+    </GridPane>
+</VBox>

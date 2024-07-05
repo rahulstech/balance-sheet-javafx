@@ -28,9 +28,9 @@
                 <ComboBox fx:id="endMonthComboBox" />
             </VBox>
         </HBox>
-        <Button HBox.hgrow="NEVER" alignment="BOTTOM_RIGHT" text="Create Chart" onAction="#handleCreateChartButtonClick" >
+        <Button styleClass="base-button" HBox.hgrow="NEVER" alignment="BOTTOM_RIGHT" text="Create Chart" onAction="#handleCreateChartButtonClick" >
             <graphic>
-                <FontIcon iconLiteral="mdi-chart-bar"/>
+                <FontIcon iconLiteral="mdi-chart-bar" styleClass="control-icon"/>
             </graphic>
         </Button>
     </HBox>
@@ -47,14 +47,14 @@
         </ScrollPane>
 
         <VBox  HBox.hgrow="NEVER" spacing="10" alignment="TOP_RIGHT">
-            <Button VBox.vgrow="NEVER" text="Add Category" onAction="#handleAddCategoryButtonClick" prefWidth="200" >
+            <Button styleClass="base-button" VBox.vgrow="NEVER" text="Add Category" onAction="#handleAddCategoryButtonClick" prefWidth="200" >
                 <graphic>
-                    <FontIcon iconLiteral="mdi-plus"/>
+                    <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button VBox.vgrow="NEVER" text="Clear Categories" onAction="#handleClearCategoriesButtonClick"  prefWidth="200">
+            <Button styleClass="base-button" VBox.vgrow="NEVER" text="Clear Categories" onAction="#handleClearCategoriesButtonClick"  prefWidth="200">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-broom"/>
+                    <FontIcon iconLiteral="mdi-broom" styleClass="control-icon"/>
                 </graphic>
             </Button>
         </VBox>

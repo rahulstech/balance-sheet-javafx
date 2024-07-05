@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="rahulstech.jfx.balancesheet.controller.ImportMiscTabController"
@@ -20,6 +21,10 @@
         <ScrollPane maxHeight="120" fitToWidth="true" hbarPolicy="NEVER">
             <FlowPane style="-fx-padding: 12;" fx:id="importOptionsFlowPane" hgap="10" vgap="10"/>
         </ScrollPane>
-        <Button text="Reset" HBox.hgrow="NEVER" onAction="#handleResetButtonClick"/>
+        <Button styleClass="base-button" text="Reset" HBox.hgrow="NEVER" onAction="#handleResetButtonClick">
+            <graphic>
+                <FontIcon iconLiteral="mdi-broom" styleClass="control-icon"/>
+            </graphic>
+        </Button>
     </HBox>
 </GridPane>

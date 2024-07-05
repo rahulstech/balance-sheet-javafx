@@ -1,29 +1,50 @@
 
 /* Base style for the Material Design button */
-.button {
+.base-button {
     -fx-background-color: primaryColor; /* Primary color */
     -fx-text-fill: onPrimary; /* Text color */
     -fx-background-radius: 8px; /* Rounded corners */
-    -fx-padding: 10px 20px; /* Padding */
+    -fx-padding: 10px 8px; /* Padding */
     -fx-font-size: 14px; /* Font size */
     -fx-font-weight: bold; /* Font weight */
     -fx-border-color: transparent; /* Border color */
     -fx-border-width: 0; /* Border width */
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4); /* Shadow */
     -fx-cursor: hand; /* Pointer cursor on hover */
+    -fx-graphic-text-gap: 0.5em;
 }
 
-.button:hover {
+.base-button:hover {
     -fx-background-color: primaryColorDark; /* Darker shade for hover state */
 }
 
-.button:pressed {
+.base-button:pressed {
     -fx-background-color: primaryColor; /* Primary color when pressed */
     -fx-effect: none; /* Remove shadow when pressed */
 }
 
 /* Set text-fill color for any child inside the graphic of button */
-.button > .ikonli-font-icon, .button > .stacked-ikonli-font-icon {
-   -fx-icon-color: onPrimary;
+.button > .control-icon {
+    -fx-icon-color: onPrimary;
    -fx-icon-size: 20px;
+}
+
+.button-error, .button-error:hover, .button-error:pressed {
+    -fx-background-color: #DF2E38;
+    -fx-text-fill: onPrimary;
+}
+
+.button-success, .button-success:hover, .button-success:pressed {
+    -fx-background-color: #5D9C59;
+    -fx-text-fill: onPrimary;
+}
+
+.button-error:hover, .button-error:pressed {
+    -fx-background-color: errorDark;
+    -fx-text-fill: onError;
+}
+
+.button-success:hover, .button-success:pressed {
+    -fx-background-color: successDark;
+    -fx-text-fill: onSuccess;
 }

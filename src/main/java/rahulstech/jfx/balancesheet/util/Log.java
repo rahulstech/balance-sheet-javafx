@@ -15,6 +15,7 @@ import java.util.logging.Level;
 
 public class Log {
 
+    // TODO: should not double log entries
     public static void init(File dir, boolean development) {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);

@@ -82,7 +82,8 @@ public class BalancesheetApp extends Application {
         Log.init(getLogsDirectory(),isDevelopment());
         getAppExecutor().execute(()->{
             BalancesheetDb.setDatabaseDirectory(getDatabaseDirectory());
-            BalancesheetDb.getInstance();
+            BalancesheetDb.setLogging(isDevelopment());
+            BalancesheetDb.getInstance(); // to initialized the database
         });
     }
 
@@ -103,6 +104,16 @@ public class BalancesheetApp extends Application {
         viewLauncher.load();
         viewLauncher.getWindow().setMaximized(true);
         viewLauncher.getWindow().show();
+        /*ViewLauncher viewLauncher = new ViewLauncher.Builder()
+                .setOwnerWindow(stage)
+                .setTitle("Balance Sheet")
+                .setFxml("create_derivative.fxml")
+                .setShowInDifferentWindow(false)
+                .setStyleSheet("theme.css")
+                .build();
+        viewLauncher.load();
+        viewLauncher.getWindow().setMaximized(true);
+        viewLauncher.getWindow().show();*/
     }
 
     @Override

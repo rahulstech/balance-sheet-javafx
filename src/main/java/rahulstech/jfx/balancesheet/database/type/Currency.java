@@ -2,9 +2,12 @@ package rahulstech.jfx.balancesheet.database.type;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class Currency implements Comparable<Currency> {
+
+    private static final int SCALE = 4;
 
     public static final Currency ZERO = new Currency(BigDecimal.ZERO);
 
@@ -12,7 +15,8 @@ public class Currency implements Comparable<Currency> {
 
     // Private constructor
     private Currency(BigDecimal value) {
-        this.value = value.setScale(2, RoundingMode.HALF_UP);
+        // scale 4 is used for precise calculation
+        this.value = value.setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     // Static factory methods for creating Currency objects
@@ -54,7 +58,7 @@ public class Currency implements Comparable<Currency> {
 
     // Method to divide one Currency object by another
     public Currency divide(Currency other) {
-        BigDecimal result = this.value.divide(other.value, 2, RoundingMode.HALF_UP);
+        BigDecimal result = this.value.divide(other.value, SCALE, RoundingMode.HALF_UP);
         return result.compareTo(BigDecimal.ZERO) == 0 ? ZERO : new Currency(result);
     }
 
@@ -62,6 +66,9 @@ public class Currency implements Comparable<Currency> {
         return multiply(Currency.from("-1"));
     }
 
+    public boolean isNegative() {
+        return compareTo(ZERO) < 0;
+    }
 
     @Override
     public int compareTo(Currency other) {
@@ -71,5 +78,18 @@ public class Currency implements Comparable<Currency> {
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Currency currency = (Currency) o;
+        return Objects.equals(value, currency.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
     }
 }

@@ -3,24 +3,25 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxListCell;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.model.MonthlyTypeModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
+import rahulstech.jfx.balancesheet.util.ChartUtil;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
@@ -170,15 +171,19 @@ public class MonthlyTypeChartController extends Controller {
             XYChart.Data<String,Number> dataPoint = new XYChart.Data<>(model.getYearMonth().format(YEAR_MONTH_FORMAT_CHART), amount.getValue());
             data.add(dataPoint);
             series.getData().add(dataPoint);
-            Tooltip tooltip = new Tooltip(amount.toString());
-            Tooltip.install(dataPoint.getNode(),tooltip);
+
+            setChartIndicator(dataPoint.getNode(), TextUtil.prettyPrintCurrency(amount));
         }
         Currency average = total.divide(Currency.from(monthlyData.size()));
         XYChart.Data<String,Number> avgDataPoint = new XYChart.Data<>("Average",average.getValue());
         avgData.add(avgDataPoint);
         avgSeries.getData().add(avgDataPoint);
-        Tooltip tooltip = new Tooltip(average.toString());
-        Tooltip.install(avgDataPoint.getNode(),tooltip);
+
+        setChartIndicator(avgDataPoint.getNode(), TextUtil.prettyPrintCurrency(average));
+    }
+
+    private void setChartIndicator(Node node, String text) {
+        ChartUtil.setChartIndicator(node,text);
     }
 
     private void showAlert(String title, String message) {

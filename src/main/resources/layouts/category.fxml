@@ -6,23 +6,35 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import javafx.geometry.Insets?>
 <VBox prefWidth="700"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.CategoryController" spacing="10">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.CategoryController"
+      spacing="10">
+    <padding>
+        <Insets top="10" left="10" right="10" bottom="10"/>
+    </padding>
     <HBox spacing="10" >
-        <padding>
-            <Insets top="10" left="10" right="10" bottom="10"/>
-        </padding>
-        <Label text="Name:"/>
-        <TextField fx:id="nameField" prefWidth="220" />
-        <Button text="Add Category" onAction="#handleAddCategory">
-            <graphic>
-                <FontIcon iconLiteral="mdi-plus"/>
-            </graphic>
-        </Button>
-        <Button text="Refresh" onAction="#handleRefresh">
-            <graphic>
-                <FontIcon iconLiteral="mdi-refresh"/>
-            </graphic>
-        </Button>
+        <TextField fx:id="nameField" promptText="Name" prefWidth="220" />
+        <HBox HBox.hgrow="ALWAYS" alignment="TOP_RIGHT" spacing="10">
+            <Button styleClass="base-button" text="Edit" onAction="#handleEditButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-pencil" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+            <Button styleClass="base-button,button-error" text="Delete" onAction="#handleDeleteButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+            <Button styleClass="base-button,button-success" text="Add Category" onAction="#handleAddCategory">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+            <Button styleClass="base-button" text="Refresh" onAction="#handleRefresh">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-refresh" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+        </HBox>
     </HBox>
     <ListView fx:id="categoryList"/>
 </VBox>

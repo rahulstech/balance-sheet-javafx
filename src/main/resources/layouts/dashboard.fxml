@@ -11,7 +11,6 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <!--suppress JavaFxUnresolvedFxIdReference -->
-<?import org.kordamp.ikonli.javafx.StackedFontIcon?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="rahulstech.jfx.balancesheet.controller.DashboardController">
@@ -21,14 +20,14 @@
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10">
-            <Button graphicTextGap="6" text="Import" fx:id="importButton" onAction="#handleImportButtonClick">
+            <Button styleClass="base-button" graphicTextGap="6" text="Import" fx:id="importButton" onAction="#handleImportButtonClick">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-download"/>
+                    <FontIcon iconLiteral="mdi-download" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button graphicTextGap="6" text="Delete Database" onAction="#handleDeleteDatabaseButtonClick">
+            <Button styleClass="base-button,button-error" graphicTextGap="6" text="Delete Database" onAction="#handleDeleteDatabaseButtonClick">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-delete" iconColor="orangered"/>
+                    <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
                 </graphic>
             </Button>
         </HBox>
@@ -44,24 +43,24 @@
                 </VBox.margin>
             </VBox>
             <HBox alignment="CENTER" spacing="10">
-                <Button text="Accounts" fx:id="accountsButton" onAction="#handleAccountsButtonClick">
+                <Button styleClass="base-button" text="Assets" fx:id="accountsButton" onAction="#handleAccountsButtonClick">
                     <graphic>
-                        <FontIcon iconLiteral="mdi-currency-inr"/>
+                        <FontIcon iconLiteral="mdi-currency-inr" styleClass="control-icon"/>
                     </graphic>
                 </Button>
-                <Button text="Histories" fx:id="historiesButton" onAction="#handleHistoriesButtonClick">
+                <Button styleClass="base-button" text="Histories" fx:id="historiesButton" onAction="#handleHistoriesButtonClick">
                     <graphic>
-                        <FontIcon iconLiteral="mdi-history"/>
+                        <FontIcon iconLiteral="mdi-history" styleClass="control-icon"/>
                     </graphic>
                 </Button>
-                <Button text="Budgets" fx:id="budgetButton" onAction="#handleBudgetsButtonAction">
+                <Button styleClass="base-button" text="Budgets" fx:id="budgetButton" onAction="#handleBudgetsButtonAction">
                     <graphic>
-                        <FontIcon  iconLiteral="mdi-calculator"/>
+                        <FontIcon  iconLiteral="mdi-calculator" styleClass="control-icon"/>
                     </graphic>
                 </Button>
-                <Button text="Charts" fx:id="chartsButton" onAction="#handleCharts">
+                <Button styleClass="base-button" text="Charts" fx:id="chartsButton" onAction="#handleCharts">
                     <graphic>
-                        <FontIcon iconLiteral="mdi-chart-bar"/>
+                        <FontIcon iconLiteral="mdi-chart-bar" styleClass="control-icon"/>
                     </graphic>
                 </Button>
             </HBox>

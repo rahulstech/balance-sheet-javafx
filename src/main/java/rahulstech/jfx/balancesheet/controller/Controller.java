@@ -16,6 +16,8 @@ import java.util.ResourceBundle;
 @SuppressWarnings("ALL")
 public class Controller implements Initializable {
 
+    private static final String TAG = Controller.class.getSimpleName();
+
     private ObjectProperty<Stage> windowProperty = new SimpleObjectProperty<>();
 
     private ObjectProperty<Scene> sceneProperty = new SimpleObjectProperty<>();
@@ -63,6 +65,8 @@ public class Controller implements Initializable {
     public ResourceBundle getResource() {
         return resource;
     }
+
+    public Controller() {}
 
     @Override
     public final void initialize(URL url, ResourceBundle resourceBundle) {

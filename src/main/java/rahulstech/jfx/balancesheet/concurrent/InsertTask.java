@@ -188,8 +188,8 @@ public class InsertTask extends Task<Boolean> {
         try {
             int count = 0;
             for (Account account : accounts) {
-                Account returned = accountDao.createIfNotExists(account);
-                if (returned==account) {
+                // either create if the importing account does not exits or update on exist
+                if (accountDao.createOrUpdate(account).getNumLinesChanged()>0) {
                     count++;
                 }
             }
@@ -203,7 +203,8 @@ public class InsertTask extends Task<Boolean> {
     }
 
     private void insertTransactionHistories(TransactionHistoryDao transactionHistoryDao, List<TransactionHistory> histories) {
-        transactionHistoryDao.insertTransactionHistories(histories);
+        // updateIfExists set to false by default not to update existing histories
+        transactionHistoryDao.insertTransactionHistories(histories,false);
     }
 
     private List<Account> convertTo_entity_Account(List<rahulstech.jfx.balancesheet.json.model.Account> accounts) {

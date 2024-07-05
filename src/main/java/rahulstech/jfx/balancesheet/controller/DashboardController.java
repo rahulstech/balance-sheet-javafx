@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
 import rahulstech.jfx.balancesheet.json.model.DataModel;
@@ -35,6 +34,14 @@ public class DashboardController extends Controller {
     private Button chartsButton;
 
     private Future<?> importTask;
+
+    private AssetsTabsController assetsTabsController;
+
+    private TransactionHistoryController transactionHistoryController;
+
+    private BudgetTableController budgetTableController;
+
+    private ChartBrowserController chartBrowserController;
 
     @Override
     protected void onInitialize(ResourceBundle res) {}
@@ -102,37 +109,47 @@ public class DashboardController extends Controller {
 
     @FXML
     private void handleAccountsButtonClick() {
-        ViewLauncher loader = getViewLauncherBuilder()
-                .setTitle("Account")
-                .setStageStyle(StageStyle.UTILITY)
-                .setFxml("accounts_list.fxml")
-                .setHeight(500)
-                .setWidth(600)
-                .build()
-                .load();
-        loader.getWindow().show();
+       if (null==assetsTabsController) {
+            ViewLauncher loader = getViewLauncherBuilder()
+                    .setTitle("Assets")
+                    .setFxml("assets_tabs.fxml")
+                    .setDependsOnOwnerWindow(false)
+                    .build()
+                    .load();
+            loader.getWindow().setMaximized(true);
+            assetsTabsController = loader.getController();
+        }
+        assetsTabsController.getWindow().show();
     }
 
     @FXML
     private void handleHistoriesButtonClick() {
-        ViewLauncher loader = getViewLauncherBuilder()
-                .setTitle("Histories")
-                .setFxml("transaction_histories.fxml")
-                .build()
-                .load();
-        loader.getWindow().setMaximized(true);
-        loader.getWindow().show();
+        if (null==transactionHistoryController) {
+            ViewLauncher loader = getViewLauncherBuilder()
+                    .setTitle("Histories")
+                    .setFxml("transaction_histories.fxml")
+                    .setDependsOnOwnerWindow(false)
+                    .build()
+                    .load();
+            loader.getWindow().setMaximized(true);
+            transactionHistoryController = loader.getController();
+        }
+        transactionHistoryController.getWindow().show();
     }
 
     @FXML
     private void handleCharts() {
-        ViewLauncher loader = getViewLauncherBuilder()
-                .setTitle("Charts")
-                .setFxml("chart_browser.fxml")
-                .build();
-        loader.load();
-        loader.getWindow().setMaximized(true);
-        loader.getWindow().show();
+        if (null==chartBrowserController) {
+            ViewLauncher loader = getViewLauncherBuilder()
+                    .setTitle("Charts")
+                    .setFxml("chart_browser.fxml")
+                    .setDependsOnOwnerWindow(false)
+                    .build();
+            loader.load();
+            loader.getWindow().setMaximized(true);
+            chartBrowserController = loader.getController();
+        }
+        chartBrowserController.getWindow().show();
     }
 
     private File lastUsedDirectory;
@@ -148,12 +165,16 @@ public class DashboardController extends Controller {
 
     @FXML
     private void handleBudgetsButtonAction(ActionEvent event) {
-        ViewLauncher viewLauncher = getViewLauncherBuilder()
-                .setTitle("Budgets")
-                .setFxml("budget.fxml")
-                .build();
-        viewLauncher.load();
-        viewLauncher.getWindow().setMaximized(true);
-        viewLauncher.getWindow().show();
+        if (null==budgetTableController) {
+            ViewLauncher viewLauncher = getViewLauncherBuilder()
+                    .setTitle("Budgets")
+                    .setFxml("budget.fxml")
+                    .setDependsOnOwnerWindow(false)
+                    .build();
+            viewLauncher.load();
+            viewLauncher.getWindow().setMaximized(true);
+            budgetTableController = viewLauncher.getController();
+        }
+        budgetTableController.getWindow().show();
     }
 }

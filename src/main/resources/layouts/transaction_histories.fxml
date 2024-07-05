@@ -3,7 +3,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.geometry.Insets?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.TransactionHistoryController">
+    <padding>
+        <Insets top="10" left="10" bottom="10" right="10"/>
+    </padding>
     <top>
         <HBox spacing="10" alignment="CENTER" style="-fx-padding: 12px 16px;">
             <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
@@ -13,34 +17,29 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT">
                 <HBox spacing="10">
-                    <Button text="Select All" onAction="#handleSelectAll">
+                    <Button styleClass="base-button" text="Edit Selected" onAction="#handleEditHistory">
                         <graphic>
-                            <FontIcon iconLiteral="mdi-select-all"/>
+                            <FontIcon iconLiteral="mdi-pencil" styleClass="control-icon"/>
                         </graphic>
                     </Button>
-                    <Button text="Delete Selected" onAction="#handleDeleteHistory">
+                    <Button styleClass="base-button,button-error" text="Delete Selected" onAction="#handleDeleteHistory">
                         <graphic>
-                            <FontIcon iconLiteral="mdi-delete"/>
+                            <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
                         </graphic>
                     </Button>
-                    <Button text="Edit Selected" onAction="#handleEditHistory">
+                    <Button styleClass="base-button" text="Filter" onAction="#handleFilter">
                         <graphic>
-                            <FontIcon iconLiteral="mdi-pencil"/>
+                            <FontIcon iconLiteral="mdi-filter" styleClass="control-icon"/>
                         </graphic>
                     </Button>
-                    <Button text="Filter" onAction="#handleFilter">
+                    <Button styleClass="base-button" text="Refresh" onAction="#handleRefresh">
                         <graphic>
-                            <FontIcon iconLiteral="mdi-filter"/>
+                            <FontIcon iconLiteral="mdi-refresh" styleClass="control-icon"/>
                         </graphic>
                     </Button>
-                    <Button text="Refresh" onAction="#handleRefresh">
+                    <Button styleClass="base-button,button-success" text="Add History" onAction="#handleAddHistory">
                         <graphic>
-                            <FontIcon iconLiteral="mdi-refresh"/>
-                        </graphic>
-                    </Button>
-                    <Button text="Add History" onAction="#handleAddHistory">
-                        <graphic>
-                            <FontIcon iconLiteral="mdi-plus"/>
+                            <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
                         </graphic>
                     </Button>
                 </HBox>
@@ -51,11 +50,11 @@
         <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="dateColumn" text="Date" prefWidth="160"/>
+                <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
                 <TableColumn fx:id="amountColumn" text="Amount" prefWidth="160"/>
                 <TableColumn fx:id="taxColumn" text="Tax" prefWidth="160"/>
-                <TableColumn fx:id="srcColumn" text="Source" prefWidth="140"/>
-                <TableColumn fx:id="destColumn" text="Destination" prefWidth="140"/>
-                <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+                <TableColumn fx:id="srcColumn" text="From" prefWidth="140"/>
+                <TableColumn fx:id="destColumn" text="In" prefWidth="140"/>
                 <TableColumn fx:id="categoriesColumn" text="Categories" prefWidth="200"/>
                 <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250"/>
             </columns>

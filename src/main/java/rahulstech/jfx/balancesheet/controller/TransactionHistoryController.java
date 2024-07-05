@@ -5,20 +5,22 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import rahulstech.jfx.balancesheet.concurrent.TransactionHistoryDeleteTask;
 import rahulstech.jfx.balancesheet.concurrent.TransactionHistoryFilterTask;
 import rahulstech.jfx.balancesheet.database.dao.HistoryFilterData;
+import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.database.entity.TransactionHistory;
+import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.TransactionType;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -43,13 +45,13 @@ public class TransactionHistoryController extends Controller {
     private TableView<TransactionHistory> transactionTable;
 
     @FXML
-    private TableColumn<TransactionHistory, String> dateColumn;
+    private TableColumn<TransactionHistory, LocalDate> dateColumn;
 
     @FXML
-    private TableColumn<TransactionHistory, Text> amountColumn;
+    private TableColumn<TransactionHistory, Currency> amountColumn;
 
     @FXML
-    private TableColumn<TransactionHistory,String> taxColumn;
+    private TableColumn<TransactionHistory,Currency> taxColumn;
 
     @FXML
     private TableColumn<TransactionHistory, String> srcColumn;
@@ -73,33 +75,109 @@ public class TransactionHistoryController extends Controller {
     protected void onInitialize(ResourceBundle res) {
         transactionTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        dateColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getWhen().format(WHEN_FORMATER)));
+        dateColumn.setCellValueFactory(cellData -> {
+            TransactionHistory history = cellData.getValue();
+            LocalDate cell_value = null==history ? null : history.getWhen();
+            return new SimpleObjectProperty<>(cell_value);
+        });
+        dateColumn.setCellFactory(param -> new TableCell<>(){
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setText(item.format(WHEN_FORMATER));
+                }
+            }
+        });
 
         amountColumn.setCellValueFactory(cellData -> {
-            TransactionHistory transaction = cellData.getValue();
-            Text text = new Text(transaction.getAmount().toString());
-            if (transaction.getType() == TransactionType.WITHDRAW) {
-                text.setFill(Color.RED);
-            } else if (transaction.getType() == TransactionType.DEPOSIT) {
-                text.setFill(Color.GREEN);
-            } else {
-                text.setFill(Color.web("#00B4D8"));
+            TransactionHistory data = cellData.getValue();
+            Currency cell_value;
+            if (null==data) {
+                cell_value = null;
             }
-            return new SimpleObjectProperty<>(text);
+            else {
+                cell_value = data.getAmount();
+            }
+            return new SimpleObjectProperty<>(cell_value);
+        });
+        amountColumn.setCellFactory(column->new TableCell<>(){
+            @Override
+            protected void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    TransactionHistory history = getTableRow().getItem();
+                    getStyleClass().removeAll("text-debit","text-credit","text-transfer");
+                    if (history.getType() == TransactionType.WITHDRAW) {
+                        getStyleClass().add("text-debit");
+
+                    } else if (history.getType() == TransactionType.DEPOSIT) {
+                        getStyleClass().add("text-credit");
+                    } else {
+                        getStyleClass().add("text-transfer");
+                    }
+                    setText(TextUtil.prettyPrintCurrency(item));
+                }
+            }
         });
 
         taxColumn.setCellValueFactory(cellData -> {
             TransactionHistory transaction = cellData.getValue();
-            String tax = null==transaction.getTax() ? null : transaction.getTax().toString();
-            return new SimpleStringProperty(tax);
+            Currency tax = null==transaction.getTax() ? null : transaction.getTax();
+            return new SimpleObjectProperty<>(tax);
+        });
+        taxColumn.setCellFactory(param->new TableCell<>(){
+            @Override
+            protected void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setText(TextUtil.prettyPrintCurrency(item));
+                }
+            }
         });
 
-        srcColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getSrc() != null ? cellData.getValue().getSrc().getName() : ""));
+        srcColumn.setCellValueFactory(cellData ->{
+            TransactionHistory history = cellData.getValue();
+            String cell_value = null;
+            if (null!=history) {
+                TransactionType type = history.getType();
+                // only for WITHDRAW and TRANSFER set srcAccount name
+                if (type!=TransactionType.DEPOSIT) {
+                    cell_value = null!=history.getSrc() ? history.getSrc().getName() : null;
+                }
+            }
+            return new SimpleStringProperty(cell_value);
+        });
 
-        destColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getDest() != null ? cellData.getValue().getDest().getName() : ""));
+        destColumn.setCellValueFactory(cellData -> {
+            TransactionHistory history = cellData.getValue();
+            String cell_value = null;
+            if (null!=history) {
+                TransactionType type = history.getType();
+                Account account;
+                // for DEPOSITE set srcAccount name for TRANSFER set destAccount name
+                if (type==TransactionType.DEPOSIT) {
+                    account = history.getSrc();
+                }
+                else if (type==TransactionType.TRANSFER) {
+                    account = history.getDest();
+                }
+                else {
+                    account = null;
+                }
+                cell_value = null!=account ? account.getName() : null;
+            }
+            return new SimpleStringProperty(cell_value);
+        });
 
         typeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getType().toString()));
         descriptionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
@@ -173,41 +251,21 @@ public class TransactionHistoryController extends Controller {
                     task.setOnSucceeded(e->{
                         transactionTable.getItems().removeAll(histories);
                     });
-                    task.setOnFailed(e-> task.getException().printStackTrace());
+                    task.setOnFailed(e-> Log.error(TAG,"handleDeleteHistory",task.getException()));
                     getApp().getAppExecutor().submit(task);
                 },
                 "No Cancel",null);
     }
 
-    @FXML
-    private void handleEditHistory() {
-        if (transactionTable.getSelectionModel().getSelectedItems().size() > 1) {
-            return;
-        }
-        TransactionHistory item = transactionTable.getSelectionModel().getSelectedItem();
-        if (null == item) {
-            return;
-        }
+    private void handleTableRowDoubleClicked(TransactionHistory history) {
         ViewLauncher launcher = getViewLauncherBuilder()
                 .setTitle("Edit History")
                 .setFxml("input_transaction_history.fxml")
-                .setStageModality(Modality.APPLICATION_MODAL)
+                .setStageStyle(StageStyle.UTILITY)
                 .build().load();
         InputTransactionHistoryController controller = launcher.getController();
         controller.getWindow().show();
-        controller.setOldHistory(item);
-    }
-
-    @FXML
-    private void handleSelectAll(ActionEvent event) {
-        int itemCount = transactionTable.getItems().size();
-        int selectionCount = transactionTable.getSelectionModel().getSelectedItems().size();
-        if (itemCount != selectionCount) {
-            transactionTable.getSelectionModel().selectAll();
-        }
-        else {
-            transactionTable.getSelectionModel().clearSelection();
-        }
+        controller.setOldHistory(history);
     }
 
     @FXML
@@ -217,10 +275,9 @@ public class TransactionHistoryController extends Controller {
 
     @FXML
     private void handleFilter(ActionEvent event) {
-        ViewLauncher loader = new ViewLauncher.Builder()
+        ViewLauncher loader = getViewLauncherBuilder()
                 .setTitle("Filter")
                 .setStageStyle(StageStyle.UTILITY)
-                .setOwnerWindow(getWindow())
                 .setFxml("history_filter_tabs.fxml")
                 .build();
         loader.load();
@@ -236,6 +293,16 @@ public class TransactionHistoryController extends Controller {
                 .setStageModality(Modality.APPLICATION_MODAL)
                 .build().load();
         launcher.getWindow().show();
+    }
+
+    @FXML
+    private void handleEditHistory(ActionEvent event) {
+        if (transactionTable.getSelectionModel().getSelectedItems().size()!=1) {
+            Log.debug(TAG,"can handle edit history when exactly one item is selected");
+            return;
+        }
+        TransactionHistory history = transactionTable.getSelectionModel().getSelectedItem();
+        handleTableRowDoubleClicked(history);
     }
 
     private void setTransactionHistories(List<TransactionHistory> value) {

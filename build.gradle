@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'rahulstech.jfx'
-version '1.1.0'
+version '2.0.0'
 
 repositories {
     mavenCentral()
@@ -34,6 +34,12 @@ application {
     mainModule = 'rahulstech.jfx.balancesheet'
     mainClass = 'rahulstech.jfx.balancesheet.BalancesheetApp'
 }
+
+// use this to pass environment variable. this value is passed during
+// running the project. so the package app will not get this value
+//run {
+//    environment('BUILD_VARIANT','DEVELOPMENT')
+//}
 
 javafx {
     version = '22-ea+11'
@@ -84,7 +90,7 @@ jlink {
             '--icon', './app_icon.png', // Path to your icon
             '--description','App to record your day-to-day withdraws and deposites category wise and check your income expense patterns mothly,' +
                     'also create budgets to be more target oriented', // Small description for app
-            '--app-version',${appVersion}, // Application version
+            '--app-version',appVersion, // Application version
             '--vendor', 'Rahul\'s Tech', // Vendor name
             '--linux-package-name', 'balancesheet', // Linux package name
             '--linux-deb-maintainer', 'rahulstech18@gmail.com', // Email only

@@ -8,6 +8,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
 import rahulstech.jfx.balancesheet.database.dao.BudgetFilterData;
 import rahulstech.jfx.balancesheet.database.entity.Category;
+import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.util.ViewLoader;
 
 import java.time.LocalDate;
@@ -41,6 +42,8 @@ public class BudgetFilterController extends Controller {
 
     @Override
     protected void onInitialize(ResourceBundle res) {
+        startDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
+        endDatePicker.setConverter(TextUtil.getLocalDateStringConverter(TextUtil.DATE_PICK_FORMAT));
         addCategoryListView();
     }
 

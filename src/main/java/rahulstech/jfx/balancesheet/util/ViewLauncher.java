@@ -10,7 +10,6 @@ import rahulstech.jfx.balancesheet.controller.Controller;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @SuppressWarnings({"FieldMayBeFinal","unused"})
@@ -30,6 +29,7 @@ public class ViewLauncher {
     private double height;
     private double width;
     private Set<String> styleSheets;
+    private boolean dependesOnWonerWindow;
 
     private ViewLauncher(Builder builder) {
         this.showInDifferentWindow = builder.showInDifferentWindow;
@@ -45,6 +45,7 @@ public class ViewLauncher {
         this.height = builder.height;
         this.width = builder.width;
         this.styleSheets = builder.styleSheets;
+        this.dependesOnWonerWindow = builder.dependsOnOwnerWindow;
     }
 
     public ViewLauncher load() {
@@ -66,7 +67,7 @@ public class ViewLauncher {
         else {
             window = ownerWindow;
         }
-        if (ownerWindow != window) {
+        if (ownerWindow != window && dependesOnWonerWindow) {
             window.initOwner(ownerWindow);
         }
         if (null != this.stageModality) {
@@ -106,7 +107,7 @@ public class ViewLauncher {
     }
 
     private void copyStyleSheets(Scene from, Scene to) {
-        if (from!=to) {
+        if (null != from && !from.equals(to)) {
             to.getStylesheets().addAll(from.getStylesheets());
         }
     }
@@ -135,6 +136,7 @@ public class ViewLauncher {
         private double height = -1;
         private double width = -1;
         private Set<String> styleSheets;
+        private boolean dependsOnOwnerWindow = true;
 
         public Builder setTitle(String title) {
             this.title = title;
@@ -207,6 +209,11 @@ public class ViewLauncher {
             return this;
         }
 
+        public Builder setDependsOnOwnerWindow(boolean dependsOnOwnerWindow) {
+            this.dependsOnOwnerWindow = dependsOnOwnerWindow;
+            return this;
+        }
+
         public ViewLauncher build() {
             return new ViewLauncher(this);
         }
@@ -264,6 +271,10 @@ public class ViewLauncher {
 
     public Set<String> getStyleSheets() {
         return styleSheets;
+    }
+
+    public boolean isDependesOnWonerWindow() {
+        return dependesOnWonerWindow;
     }
 }
 

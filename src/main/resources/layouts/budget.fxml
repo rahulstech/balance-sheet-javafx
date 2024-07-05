@@ -5,40 +5,35 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.BudgetController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="rahulstech.jfx.balancesheet.controller.BudgetTableController">
     <top>
         <HBox alignment="CENTER_RIGHT" spacing="12">
             <padding>
                 <Insets top="8" bottom="8" left="12" right="12"/>
             </padding>
-            <Button text="Select All" onAction="#handleSelectButtonAction">
+            <Button styleClass="base-button" text="Edit Selected" onAction="#handleEditButtonAction">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-select-all"/>
+                    <FontIcon iconLiteral="mdi-pencil" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button text="Delete Selected" onAction="#handleDeleteSelectedButtonAction">
+            <Button styleClass="base-button,button-error" text="Delete Selected" onAction="#handleDeleteSelectedButtonAction">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-delete"/>
+                    <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button text="Edit Selected" onAction="#handleEditButtonAction">
+            <Button styleClass="base-button" text="Filter" onAction="#handleFilterButtonAction">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-pencil"/>
+                    <FontIcon iconLiteral="mdi-filter" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button text="Filter" onAction="#handleFilterButtonAction">
+            <Button styleClass="base-button" text="Refresh" onAction="#handleRefreshButtonAction">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-filter"/>
+                    <FontIcon iconLiteral="mdi-refresh" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button text="Refresh" onAction="#handleRefreshButtonAction">
+            <Button styleClass="base-button,button-success" text="Add Budget" onAction="#handleAddButtonAction">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-refresh"/>
-                </graphic>
-            </Button>
-            <Button text="Add Budget" onAction="#handleAddButtonAction">
-                <graphic>
-                    <FontIcon iconLiteral="mdi-plus"/>
+                    <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
                 </graphic>
             </Button>
         </HBox>

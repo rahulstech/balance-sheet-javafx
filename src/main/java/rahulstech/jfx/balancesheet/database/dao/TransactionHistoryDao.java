@@ -41,12 +41,24 @@ public class TransactionHistoryDao extends BaseDaoImpl<TransactionHistory,Long> 
         );
     }
 
-    public  void insertTransactionHistories(List<TransactionHistory> histories) {
+    /**
+     * updateIfExists value gives user more power to choose what to with exiting histories.
+     * if set to {@literal true} then new histories will be added and existing histories will be updated.
+     * if set to {@literal  false} then only new histories are added existing are ignored
+     */
+    public  void insertTransactionHistories(List<TransactionHistory> histories, boolean updateIfExists) {
         if (null==histories || histories.isEmpty()) {
             return;
         }
         callWithoutExceptionHandling(()->{
-            create(histories);
+            for (TransactionHistory history : histories) {
+                if (updateIfExists) {
+                    createOrUpdate(history);
+                }
+                else {
+                    createIfNotExists(history);
+                }
+            }
             return null;
         });
     }

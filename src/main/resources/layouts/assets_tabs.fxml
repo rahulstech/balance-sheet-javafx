@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="rahulstech.jfx.balancesheet.controller.AssetsTabsController">
+
+    <TabPane VBox.vgrow="ALWAYS" fx:id="assetsTabPane">
+        <Tab fx:id="accountsTab" closable="false" text="Accounts" />
+        <Tab fx:id="derivatiesTab" closable="false" text="Derivatives"/>
+    </TabPane>
+
+</VBox>

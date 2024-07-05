@@ -2,14 +2,15 @@ package rahulstech.jfx.balancesheet.controller;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
@@ -45,10 +46,8 @@ public class CategoryController extends Controller {
                     super.updateItem(item, empty);
                     if (empty || item == null) {
                         setText(null);
-                        setContextMenu(null);
                     } else {
                         setText(item.getName());
-                        setContextMenu(createContextMenu(item));
                     }
                 }
             };
@@ -81,21 +80,6 @@ public class CategoryController extends Controller {
     private void setCategories(List<Category> value) {
         categoryList.getItems().clear();
         categoryList.getItems().addAll(value);
-    }
-
-    private ContextMenu createContextMenu(Category item) {
-        ContextMenu contextMenu = new ContextMenu();
-
-        MenuItem editItem = new MenuItem("Edit");
-        editItem.setGraphic(new FontIcon("mdi-pencil"));
-        editItem.setOnAction(event -> handleEditCategory(item));
-
-        MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setGraphic(new FontIcon("mdi-delete"));
-        deleteItem.setOnAction(event -> handleDeleteCategory(item));
-
-        contextMenu.getItems().addAll(editItem, deleteItem);
-        return contextMenu;
     }
 
     @FXML
@@ -131,18 +115,36 @@ public class CategoryController extends Controller {
         loadCategories();
     }
 
+    @FXML
+    private void handleEditButtonClicked() {
+        if (categoryList.getSelectionModel().getSelectedItems().size()!=1) {
+            return;
+        }
+        Category category = categoryList.getSelectionModel().getSelectedItem();
+        handleEditCategory(category);
+    }
+
+    @FXML
+    private void handleDeleteButtonClicked() {
+        if (categoryList.getSelectionModel().getSelectedItems().isEmpty()) {
+            return;
+        }
+        List<Category> categories = categoryList.getSelectionModel().getSelectedItems();
+        handleDeleteCategories(categories);
+    }
+
     private void handleEditCategory(Category category) {
         nameField.setText(category.getName());
         nameField.setUserData(category);
     }
 
-    private void handleDeleteCategory(Category category) {
+    private void handleDeleteCategories(List<Category> categories) {
         DialogUtil.alertConfirmation(getWindow(),
-                "Warning","Selected category will be deleted permanently. Are you sure to proceed?",
+                "Warning","Selected category(s) will be deleted permanently. Are you sure to proceed?",
                 "Delete",()->{
-                    Task<Boolean> task = TaskUtils.deleteCategories(Collections.singletonList(category),
+                    Task<Boolean> task = TaskUtils.deleteCategories(categories,
                             t->{
-                        categoryList.getItems().remove(category);
+                                categoryList.getItems().removeAll(categories);
                             },t->{
                                 Log.error(TAG,"delete-category", t.getException());
                                 DialogUtil.alertError(getWindow(),"Error","Fail to delete category. Please try again.");

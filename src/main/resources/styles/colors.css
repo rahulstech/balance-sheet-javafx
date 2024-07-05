@@ -1,19 +1,25 @@
 /* Light theme brand colors */
 .root {
     /* Primary */
-    primaryColor: #6200EE; /* design_default_color_primary */
-    primaryColorDark: #3700B3; /* design_default_color_primary_dark */
-    onPrimary: #FFFFFF; /* design_default_color_on_primary */
+    primaryColor: #6200EE;
+    primaryColorDark: #3700B3;
+    onPrimary: #FFFFFF;
 
     /* Secondary */
-    secondaryColor: #03DAC6; /* design_default_color_secondary */
-    onSecondary: #000000; /* design_default_color_on_secondary */
+    secondaryColor: #03DAC6;
+    onSecondary: #000000;
 
     /* Light theme neutral colors */
-    background: #FFFFFF; /* design_default_color_background */
-    onBackground: #000000; /* design_default_color_on_background */
-    surface: #FFFFFF; /* design_default_color_surface */
-    onSurface: #000000; /* design_default_color_on_surface */
-    error: #B00020; /* design_default_color_error */
-    onError: #FFFFFF; /* design_default_color_on_error */
+    background: #FFFFFF;
+    onBackground: #000000;
+    surface: #FFFFFF;
+    onSurface: #000000;
+    error: #DF2E38;
+    errorDark: #C51605;
+    onError: #FFFFFF;
+    success: #5D9C59;
+    successDark: #337357;
+    onSuccess: #FFFFFF;
+    neutral: #00B4D8;
+    onNeutral: #FFFFFF;
 }
