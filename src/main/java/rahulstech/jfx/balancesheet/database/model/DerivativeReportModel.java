@@ -3,6 +3,7 @@ package rahulstech.jfx.balancesheet.database.model;
 import rahulstech.jfx.balancesheet.database.entity.Derivative;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 
+@SuppressWarnings("ALL")
 public class DerivativeReportModel {
 
     private Derivative derivative;
@@ -67,5 +68,16 @@ public class DerivativeReportModel {
             return 0.00;
         }
         return totalUnrealizedPL.divide(totalInvestedValue).getValue().doubleValue()*100;
+    }
+
+    @Override
+    public String toString() {
+        return "DerivativeReportModel{" +
+                "derivative=" + derivative +
+                ", totalInvestedValue=" + totalInvestedValue +
+                ", totalTax=" + totalTax +
+                ", totalRealizedPL=" + totalRealizedPL +
+                ", totalUnrealizedPL=" + totalUnrealizedPL +
+                '}';
     }
 }

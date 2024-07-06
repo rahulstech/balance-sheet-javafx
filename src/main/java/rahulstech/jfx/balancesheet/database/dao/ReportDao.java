@@ -11,6 +11,8 @@ import rahulstech.jfx.balancesheet.database.model.DerivativeReportModel;
 import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.util.Log;
 
+import java.util.Arrays;
+
 public class ReportDao {
 
     private static final String TAG = ReportDao.class.getSimpleName();
@@ -44,6 +46,7 @@ public class ReportDao {
                         return report;
                     }
                     String[] columns = results.getFirstResult();
+                    Log.trace(TAG,"getOverallDerivativeReport: derivatives columns="+ Arrays.toString(columns));
                     report.setTotalInvestedValue(Currency.from(columns[0]));
                     report.setTotalRealizedPL(Currency.from(columns[1]));
                     report.setTotalUnrealizedPL(Currency.from(columns[2]));
@@ -55,6 +58,7 @@ public class ReportDao {
                         return report;
                     }
                     String[] columns = results.getFirstResult();
+                    Log.trace(TAG,"getOverallDerivativeReport: derivative-transactions columns="+ Arrays.toString(columns));
                     report.setTotalTax(Currency.from(columns[0]));
                 }
 

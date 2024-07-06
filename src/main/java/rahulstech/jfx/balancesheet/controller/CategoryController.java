@@ -1,18 +1,20 @@
 package rahulstech.jfx.balancesheet.controller;
 
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldListCell;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
 import rahulstech.jfx.balancesheet.database.entity.Category;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
 
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.Future;
 
 @SuppressWarnings("ALL")
@@ -32,6 +34,8 @@ public class CategoryController extends Controller {
 
     private Future<?> filterTask;
 
+    private Map<Long,Category> editedCategories = new HashMap<>();
+
     public ListView<Category> getCategoryList() {
         return categoryList;
     }
@@ -39,20 +43,43 @@ public class CategoryController extends Controller {
     @Override
     protected void onInitialize(ResourceBundle res) {
         categoryList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        categoryList.setCellFactory(listView -> {
-            ListCell<Category> cell = new ListCell<Category>() {
-                @Override
-                protected void updateItem(Category item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item.getName());
-                    }
+//        categoryList.setCellFactory(listView -> new ListCell<>() {
+//                @Override
+//                protected void updateItem(Category item, boolean empty) {
+//                    super.updateItem(item, empty);
+//                    if (empty || item == null) {
+//                        setText(null);
+//                    } else {
+//                        setText(item.getName());
+//                    }
+//                }
+//        });
+        //categoryList.setCellFactory(listView->TextFieldListCell.forListView());
+        //.categoryList.setOnEditCommit(e->handleEditCategoryName(e.));
+        categoryList.setCellFactory(listView->new TextFieldListCell<>(new StringConverter<Category>() {
+            @Override
+            public String toString(Category object) {
+                if (null==object) {
+                    return null;
                 }
-            };
-            return cell;
-        });
+                return object.getName();
+            }
+
+            @Override
+            public Category fromString(String string) {
+                if (null==string || string.isEmpty()) {
+                    return null;
+                }
+                // edit commit will use this value to update ListView
+                // NOTE: the returned object is not added to the items list
+                //      so no need to worry about returning a fake object
+                Category category = new Category();
+                category.setName(string);
+                return category;
+            }
+        }));
+        categoryList.setOnEditCommit(e->handleEditCategory(e.getSource().getItems().get(e.getIndex()),e.getNewValue()));
+
         nameField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (filterTask != null) {
                 filterTask.cancel(true);  // Cancel the currently running task
@@ -84,29 +111,12 @@ public class CategoryController extends Controller {
 
     @FXML
     private void handleAddCategory() {
-        Category oldCategory = (Category) nameField.getUserData();
         String name = nameField.getText();
-        nameField.setUserData(null);
+        nameField.clear();
         if (name != null && !name.trim().isEmpty()) {
-            Category newCategory = null == oldCategory ? new Category() : oldCategory;
+            Category newCategory = new Category();
             newCategory.setName(name);
-            nameField.clear();
-            Task<Category> createTask = TaskUtils.saveCategory(newCategory,
-                    task -> {
-                Category category = task.getValue();
-                int index = categoryList.getItems().indexOf(category);
-                if (index>=0) {
-                    categoryList.getItems().set(index,category);
-                }
-                else {
-                    categoryList.getItems().add(category);
-                }
-                    },
-                    task -> {
-                        Log.error(TAG,"add-category", task.getException());
-                        DialogUtil.alertError(getWindow(),"Save Error","Category not create");
-                    });
-            getApp().getAppExecutor().execute(createTask);
+            create(newCategory);
         }
     }
 
@@ -116,12 +126,12 @@ public class CategoryController extends Controller {
     }
 
     @FXML
-    private void handleEditButtonClicked() {
-        if (categoryList.getSelectionModel().getSelectedItems().size()!=1) {
+    private void handleSaveButtonClicked() {
+        if (editedCategories.isEmpty()) {
+            Log.info(TAG,"no categories edited, nothing to save");
             return;
         }
-        Category category = categoryList.getSelectionModel().getSelectedItem();
-        handleEditCategory(category);
+        update(editedCategories.values());
     }
 
     @FXML
@@ -133,9 +143,9 @@ public class CategoryController extends Controller {
         handleDeleteCategories(categories);
     }
 
-    private void handleEditCategory(Category category) {
-        nameField.setText(category.getName());
-        nameField.setUserData(category);
+    private void handleEditCategory(Category orinal, Category newValue) {
+        orinal.setName(newValue.getName());
+        editedCategories.put(orinal.getId(),orinal);
     }
 
     private void handleDeleteCategories(List<Category> categories) {
@@ -152,5 +162,36 @@ public class CategoryController extends Controller {
                     getApp().getAppExecutor().
                             execute(task);
                 },"Cancel",null);
+    }
+
+    private void create(Category newCategory) {
+        Task<Category> createTask = TaskUtils.saveCategory(newCategory,
+                task -> {
+                    Category category = task.getValue();
+                    categoryList.getItems().add(category);
+                },
+                task -> {
+                    Log.error(TAG,"create", task.getException());
+                    DialogUtil.alertError(getWindow(),"Save Error","Category not saved");
+                });
+        getApp().getAppExecutor().execute(createTask);
+    }
+
+    private void update(Collection<Category> categories) {
+        Stage dialog = DialogUtil.showIndeterminateProgressDialog(getWindow(),"Save Progress","Saving changes. Please wait");
+        dialog.setOnCloseRequest(Event::consume);
+        dialog.show();
+
+        Task<Void> updateTask = TaskUtils.updateCategories(categories,
+                t->{
+            dialog.hide();
+            editedCategories.clear();
+                },
+                t->{
+            dialog.hide();
+            Log.error(TAG,"udpate", t.getException());
+            DialogUtil.alertError(getWindow(),"Save Error","Category(s) not saved");
+        });
+        getApp().getAppExecutor().execute(updateTask);
     }
 }

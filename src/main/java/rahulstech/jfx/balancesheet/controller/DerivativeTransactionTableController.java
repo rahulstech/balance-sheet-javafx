@@ -190,7 +190,7 @@ public class DerivativeTransactionTableController extends Controller {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
+                if (empty || null==item || item.isEmpty()) {
                     setText(null);
                     setTooltip(null);
                 }

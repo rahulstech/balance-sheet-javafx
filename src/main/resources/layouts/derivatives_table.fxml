@@ -76,7 +76,8 @@
             <TableColumn fx:id="avgBuyPriceColumn" text="Buy Price" prefWidth="140"/>
             <TableColumn fx:id="currentUnitPriceColumn" text="Current Price" prefWidth="140"/>
             <TableColumn fx:id="currentValueColumn" text="Current Value" prefWidth="180"/>
-            <TableColumn fx:id="totalUnrealizedPLColumn" text="P&amp;L" prefWidth="150"/>
+            <TableColumn fx:id="totalRealizedPLColumn" text="Realized P&amp;L" prefWidth="150"/>
+            <TableColumn fx:id="totalUnrealizedPLColumn" text="Unrealized P&amp;L" prefWidth="150"/>
             <TableColumn fx:id="netChangeColumn" text="Net Change" prefWidth="125"/>
             <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
         </columns>

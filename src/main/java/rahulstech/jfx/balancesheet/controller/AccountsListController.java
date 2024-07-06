@@ -3,8 +3,10 @@ package rahulstech.jfx.balancesheet.controller;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import rahulstech.jfx.balancesheet.concurrent.TaskUtils;
@@ -37,12 +39,6 @@ public class AccountsListController extends Controller {
     @Override
     protected void onInitialize(ResourceBundle res) {
         accountListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        accountListView.setOnMouseClicked(e->{
-            if (e.getButton()== MouseButton.PRIMARY && e.getClickCount()==2){
-                Account account = accountListView.getSelectionModel().getSelectedItem();
-                handleEditAccount(account);
-            }
-        });
         accountListView.setCellFactory(listView->{
             return new ListCell<Account>() {
                     @Override
@@ -95,7 +91,8 @@ public class AccountsListController extends Controller {
                 "Warning","Selected account will be deleted permanently. Are you sure to proceed?",
                 "Delete",()->{
                     Task<Boolean> task = TaskUtils.deleteAccount(accounts,
-                            t-> accountListView.getItems().remove(accounts), t->{
+                            t-> accountListView.getItems().removeAll(accounts),
+                            t->{
                                 Log.error(TAG,"delete accounts",t.getException());
                                 DialogUtil.alertError(getWindow(),"Error","Account not deleted.");
                             });

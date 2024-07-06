@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import javafx.geometry.Insets?>
-<VBox prefWidth="700"
+
+<VBox
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="rahulstech.jfx.balancesheet.controller.CategoryController"
       spacing="10">
     <padding>
@@ -14,9 +15,14 @@
     <HBox spacing="10" >
         <TextField fx:id="nameField" promptText="Name" prefWidth="220" />
         <HBox HBox.hgrow="ALWAYS" alignment="TOP_RIGHT" spacing="10">
-            <Button styleClass="base-button" text="Edit" onAction="#handleEditButtonClicked">
+            <Button styleClass="base-button,button-success" text="Add Category" onAction="#handleAddCategory">
                 <graphic>
-                    <FontIcon iconLiteral="mdi-pencil" styleClass="control-icon"/>
+                    <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
+                </graphic>
+            </Button>
+            <Button styleClass="base-button" text="Save Changes" onAction="#handleSaveButtonClicked">
+                <graphic>
+                    <FontIcon iconLiteral="mdi-content-save" styleClass="control-icon"/>
                 </graphic>
             </Button>
             <Button styleClass="base-button,button-error" text="Delete" onAction="#handleDeleteButtonClicked">
@@ -24,11 +30,7 @@
                     <FontIcon iconLiteral="mdi-delete" styleClass="control-icon"/>
                 </graphic>
             </Button>
-            <Button styleClass="base-button,button-success" text="Add Category" onAction="#handleAddCategory">
-                <graphic>
-                    <FontIcon iconLiteral="mdi-plus" styleClass="control-icon"/>
-                </graphic>
-            </Button>
+
             <Button styleClass="base-button" text="Refresh" onAction="#handleRefresh">
                 <graphic>
                     <FontIcon iconLiteral="mdi-refresh" styleClass="control-icon"/>
@@ -36,5 +38,5 @@
             </Button>
         </HBox>
     </HBox>
-    <ListView fx:id="categoryList"/>
+    <ListView editable="true" fx:id="categoryList"/>
 </VBox>

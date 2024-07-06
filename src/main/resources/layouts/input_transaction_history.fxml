@@ -61,7 +61,7 @@
             </GridPane>
 
             <VBox spacing="10">
-                <ToggleButton fx:id="buttonAddMore" text="Add More" styleClass="button">
+                <ToggleButton fx:id="buttonAddMore" text="Add More" styleClass="base-button">
                     <graphic>
                         <FontIcon fx:id="caretIcon" iconLiteral="mdi-menu-down" styleClass="control-icon"/>
                     </graphic>

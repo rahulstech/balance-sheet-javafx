@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.stmt.QueryBuilder;
 import javafx.concurrent.Task;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
+import rahulstech.jfx.balancesheet.database.dao.DerivativeDao;
 import rahulstech.jfx.balancesheet.database.dao.DerivativeTransactionDao;
 import rahulstech.jfx.balancesheet.database.entity.Account;
 import rahulstech.jfx.balancesheet.database.entity.Derivative;
@@ -187,6 +188,7 @@ public class DerivativeTasks {
                                             DerivativeTransaction transaction, DerivativeTransaction oldTransaction) throws Exception {
         if (oldTransaction==null) {
             DerivativeTType type = transaction.getType();
+            Currency newCurrentUnitPrice = transaction.getPrice();
             Log.debug(TAG,"updateDerivateOnTrasaction: has new transaction of type="+type);
             // update the derivate
             if (type == DerivativeTType.SELL) {
@@ -195,7 +197,6 @@ public class DerivativeTasks {
                 // new relalized_pl = realized_pl + realized_pl_change
                 // Note: realized_pl_change may be negative
                 BigDecimal newVolume = derivative.getVolume().subtract(transaction.getVolume());
-                Currency newCurrentUnitPrice = transaction.getPrice();
                 Currency realizedPLChange = Currency.from(
                         transaction.getPrice().subtract(derivative.getAvgBuyPrice()).getValue().multiply(transaction.getVolume())
                 );
@@ -207,12 +208,10 @@ public class DerivativeTasks {
                         " oldTotalRealizedPL=" + derivative.getTotalRealizedPL() + " realizedPLChange=" + realizedPLChange + " newTotalRealizedPL=" + newTotalRealizedPL);
 
                 derivative.setVolume(newVolume);
-                derivative.setCurrentUnitPrice(newCurrentUnitPrice);
                 derivative.setTotalRealizedPL(newTotalRealizedPL);
             } else if (type == DerivativeTType.BUY) {
                 // if it's buy then add volume, change current_unit_price and avg_buy_price
                 BigDecimal newVolume = derivative.getVolume().add(transaction.getVolume());
-                Currency newCurrentUnitPrice = transaction.getPrice();
                 Currency newAvgBuyPrice = calculateAverageBuyPrice(db,derivative);
 
                 Log.trace(TAG, "updateDerivateOnTrasaction: name=" + derivative.getName() +
@@ -221,25 +220,26 @@ public class DerivativeTasks {
                         " oldAvgBuyPrice=" + derivative.getAvgBuyPrice() + " newAvgBuyPrice=" + newAvgBuyPrice);
 
                 derivative.setVolume(newVolume);
-                derivative.setCurrentUnitPrice(newCurrentUnitPrice);
                 derivative.setAvgBuyPrice(newAvgBuyPrice);
             } else {
                 // if it's reward add volume
                 BigDecimal newVolume = derivative.getVolume().add(transaction.getVolume());
-                Currency newCurrentUnitPrice = transaction.getPrice();
 
                 Log.trace(TAG, "updateDerivateOnTrasaction: name=" + derivative.getName() +
                         " oldVolume=" + derivative.getVolume() + " newVolume=" + newVolume+
                         " oldCurrentUnitPrice=" + derivative.getCurrentUnitPrice() + " newCurrentUnitPrice=" + newCurrentUnitPrice);
 
                 derivative.setVolume(newVolume);
-                derivative.setCurrentUnitPrice(newCurrentUnitPrice);
             }
+            derivative.setCurrentUnitPrice(newCurrentUnitPrice);
         }
         else {
             DerivativeTType type = oldTransaction.getType();
             boolean isDelete = null==transaction;
+            Currency newCurrentUnitPrice = isDelete ? derivative.getCurrentUnitPrice() :
+                    !oldTransaction.getPrice().equals(transaction.getPrice()) ? transaction.getPrice() : derivative.getCurrentUnitPrice();
             Log.debug(TAG,"updateDerivateOnTrasaction: has old transaction of type="+type);
+            // update the unit price only if it's updated otherwise keep the old unit price
             if (type==DerivativeTType.SELL) {
                 Currency newPL = isDelete ? Currency.ZERO : transaction.getPrice().subtract(derivative.getAvgBuyPrice())
                         .multiply(Currency.from(transaction.getVolume()));
@@ -247,7 +247,6 @@ public class DerivativeTasks {
                         .add(newPL)
                         .subtract(oldTransaction.getPrice().subtract(derivative.getAvgBuyPrice())
                                         .multiply(Currency.from(oldTransaction.getVolume())));
-                Currency newCurrentUnitPrice = isDelete ? derivative.getCurrentUnitPrice() : transaction.getPrice();
                 BigDecimal oldVolume = isDelete ? derivative.getVolume().add(oldTransaction.getVolume())
                         : derivative.getVolume().add(oldTransaction.getVolume()).subtract(transaction.getVolume());
 
@@ -257,14 +256,12 @@ public class DerivativeTasks {
                         " currentTotalRealizedPL=" + derivative.getTotalRealizedPL() + " newTotalRealizedPL=" + newTotalRealizedPL);
 
                 derivative.setTotalRealizedPL(newTotalRealizedPL);
-                derivative.setCurrentUnitPrice(newCurrentUnitPrice);
                 derivative.setVolume(oldVolume);
             }
             else if (type==DerivativeTType.BUY) {
                 // old avg buy price = ((current avg buy price * total volume) - transaction value)/(total volume - transaction volume)
                 BigDecimal oldVolume = isDelete ? derivative.getVolume().subtract(oldTransaction.getVolume())
                         : derivative.getVolume().subtract(oldTransaction.getVolume()).add(transaction.getVolume());
-                Currency newCurrentUnitPrice = isDelete ? derivative.getCurrentUnitPrice() : transaction.getPrice();
                 Currency newAvgBuyPrice = calculateAverageBuyPrice(db,derivative);
 
                 Log.trace(TAG, "updateDerivateOnTrasaction: name=" + derivative.getName() +
@@ -273,26 +270,25 @@ public class DerivativeTasks {
                         " currentAvgBuyPrice=" + derivative.getAvgBuyPrice()+" newAvgBuyPrice="+newAvgBuyPrice);
 
                 derivative.setVolume(oldVolume);
-                derivative.setCurrentUnitPrice(newCurrentUnitPrice);
                 derivative.setAvgBuyPrice(newAvgBuyPrice);
             }
             else {
                 BigDecimal oldVolume = isDelete ? derivative.getVolume().subtract(oldTransaction.getVolume()) : derivative.getVolume().subtract(oldTransaction.getVolume()).add(transaction.getVolume());
-                Currency newCurrentUnitPrice = isDelete ? derivative.getCurrentUnitPrice() : transaction.getPrice();
 
                 Log.trace(TAG, "updateDerivateOnTrasaction: name=" + derivative.getName() +
                         " currentVolume=" + derivative.getVolume() + " newVolume=" + oldVolume+
                         " oldCurrentUnitPrice=" + derivative.getCurrentUnitPrice() + " newCurrentUnitPrice=" + newCurrentUnitPrice);
 
                 derivative.setVolume(oldVolume);
-                derivative.setCurrentUnitPrice(newCurrentUnitPrice);
             }
+            derivative.setCurrentUnitPrice(newCurrentUnitPrice);
         }
         // update the derivative
         updateDerivate(db,derivative);
     }
 
     Derivative updateDerivate(BalancesheetDb db, Derivative derivative) throws Exception {
+        DerivativeDao dao = db.getDerivativeDao();
         db.getDerivativeDao().update(derivative);
         return derivative;
     }

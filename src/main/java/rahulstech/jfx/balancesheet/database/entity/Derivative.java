@@ -116,6 +116,10 @@ public class Derivative {
         return Currency.from(getAvgBuyPrice().getValue().multiply(getVolume()));
     }
 
+    public Currency getCurrentValue() {
+        return getCurrentInvestedValue().add(getUnrealizedPL());
+    }
+
     /**
      * @return increase or decrease percentage of current unit price commpared to avg buy price
      */

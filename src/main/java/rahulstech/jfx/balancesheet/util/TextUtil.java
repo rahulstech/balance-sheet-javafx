@@ -68,7 +68,15 @@ public class TextUtil {
 
             @Override
             public Currency fromString(String string) {
-                return null==string || string.isEmpty() ? Currency.ZERO : Currency.from(string);
+                if (null==string || string.isEmpty()) {
+                    return Currency.ZERO;
+                }
+                try {
+                    return Currency.from(string);
+                }
+                catch (NumberFormatException ex) {
+                    return Currency.ZERO;
+                }
             }
         };
     }
@@ -88,7 +96,12 @@ public class TextUtil {
                 if (null==string || string.isEmpty()) {
                     return BigDecimal.ZERO.setScale(round,RoundingMode.HALF_UP);
                 }
-                return new BigDecimal(string).setScale(round,RoundingMode.HALF_UP);
+                try {
+                    return new BigDecimal(string).setScale(round, RoundingMode.HALF_UP);
+                }
+                catch (NumberFormatException ex) {
+                    return BigDecimal.ZERO.setScale(round,RoundingMode.HALF_UP);
+                }
             }
         };
     }

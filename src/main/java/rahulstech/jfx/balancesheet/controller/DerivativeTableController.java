@@ -19,6 +19,7 @@ import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 import rahulstech.jfx.balancesheet.view.TextAreaPopupTableCell;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -46,11 +47,13 @@ public class DerivativeTableController extends Controller {
 
     @FXML private TableColumn<Derivative,String> nameColumn;
 
-    @FXML private TableColumn<Derivative, Number> volumeColumn;
+    @FXML private TableColumn<Derivative, BigDecimal> volumeColumn;
 
     @FXML private TableColumn<Derivative,Currency> avgBuyPriceColumn;
 
     @FXML private TableColumn<Derivative, Currency> currentUnitPriceColumn;
+
+    @FXML private TableColumn<Derivative,Currency> totalRealizedPLColumn;
 
     @FXML private TableColumn<Derivative,Currency> totalUnrealizedPLColumn;
 
@@ -131,7 +134,7 @@ public class DerivativeTableController extends Controller {
         });
         volumeColumn.setCellValueFactory(column->{
             Derivative derivative = column.getValue();
-            Number cell_value;
+            BigDecimal cell_value;
             if (null==derivative){
                 cell_value = null;
             }
@@ -191,7 +194,7 @@ public class DerivativeTableController extends Controller {
                 cell_value = null;
             }
             else {
-                cell_value = derivative.getCurrentInvestedValue();
+                cell_value = derivative.getCurrentValue();
             }
             return new SimpleObjectProperty<>(cell_value);
         });
@@ -203,6 +206,17 @@ public class DerivativeTableController extends Controller {
             }
             else {
                 cell_value = derivative.getNetChange();
+            }
+            return new SimpleObjectProperty<>(cell_value);
+        });
+        totalRealizedPLColumn.setCellValueFactory(column->{
+            Derivative derivative = column.getValue();
+            Currency cell_value;
+            if (null==derivative){
+                cell_value = null;
+            }
+            else {
+                cell_value = derivative.getTotalRealizedPL();
             }
             return new SimpleObjectProperty<>(cell_value);
         });
@@ -226,7 +240,8 @@ public class DerivativeTableController extends Controller {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
+                if (empty || null==item || item.isEmpty()) {
+                    setText(null);
                     setTooltip(null);
                 }
                 else {
@@ -273,6 +288,44 @@ public class DerivativeTableController extends Controller {
                 }
             }
         });
+        avgBuyPriceColumn.setCellFactory(column->new TextFieldTableCell<>(TextUtil.getCurrencyStringConverter()){
+            @Override
+            public void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setText(TextUtil.prettyPrintCurrency(item));
+                }
+            }
+        });
+        currentValueColumn.setCellFactory(column->new TableCell<>(){
+            @Override
+            protected void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setText(TextUtil.prettyPrintCurrency(item));
+                }
+            }
+        });
+        totalRealizedPLColumn.setCellFactory(col->new TextFieldTableCell<>(TextUtil.getCurrencyStringConverter()){
+            @Override
+            public void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    updateTableCellTextStyleForNumberSign(this,item.compareTo(Currency.ZERO));
+                    setText(TextUtil.prettyPrintCurrency(item));
+                }
+            }
+        });
+        volumeColumn.setCellFactory(column->new TextFieldTableCell<>(TextUtil.getBigDecimalStringConverter(4)));
     }
 
     @SuppressWarnings("rawtypes")
@@ -293,30 +346,51 @@ public class DerivativeTableController extends Controller {
         nameColumn.setOnEditCommit(e->handleEditName(e.getRowValue(),e.getNewValue()));
         descriptionColumn.setOnEditCommit(e->handleEditDescription(e.getRowValue(),e.getNewValue()));
         currentUnitPriceColumn.setOnEditCommit(e->handleEditCurrentUnitPrice(e.getRowValue(),e.getNewValue()));
+        avgBuyPriceColumn.setOnEditCommit(e->handleEditAvgBuyPrice(e.getRowValue(),e.getNewValue()));
+        volumeColumn.setOnEditCommit(e->handleEditVolume(e.getRowValue(),e.getNewValue()));
+        totalRealizedPLColumn.setOnEditCommit(e->handleEditRealizedPl(e.getRowValue(),e.getNewValue()));
+    }
+
+    private void handleEditRealizedPl(Derivative derivative, Currency newValue) {
+        Derivative edited = editedDerivates.getOrDefault(derivative.getId(),derivative);
+        edited.setTotalRealizedPL(newValue);
+        Log.debug(TAG,"handleEditRealizedPl: derivative: id="+derivative.getId()+" newValue=\""+newValue+"\"");
+        editedDerivates.put(derivative.getId(),edited);
+    }
+
+    private void handleEditVolume(Derivative derivative, BigDecimal newValue) {
+        Derivative edited = editedDerivates.getOrDefault(derivative.getId(),derivative);
+        edited.setVolume(newValue);
+        Log.debug(TAG,"handleEditVolume: derivative: id="+derivative.getId()+" newValue=\""+newValue+"\"");
+        editedDerivates.put(derivative.getId(),edited);
     }
 
     private void handleEditName(Derivative derivative, String newValue) {
-        long id = derivative.getId();
         Derivative edited = editedDerivates.getOrDefault(derivative.getId(),derivative);
         edited.setName(newValue);
-        Log.debug(TAG,"handleEditName: derivative: id="+id+" newValue=\""+newValue+"\"");
-        editedDerivates.put(id,derivative);
+        Log.debug(TAG,"handleEditName: derivative: id="+derivative.getId()+" newValue=\""+newValue+"\"");
+        editedDerivates.put(derivative.getId(),derivative);
     }
 
     private void handleEditDescription(Derivative derivative, String newValue) {
-        long id = derivative.getId();
         Derivative edited = editedDerivates.getOrDefault(derivative.getId(),derivative);
         edited.setDescription(newValue);
-        Log.debug(TAG,"handleEditDescription: derivative: id="+id+" newValue=\""+newValue+"\"");
-        editedDerivates.put(id,edited);
+        Log.debug(TAG,"handleEditDescription: derivative: id="+derivative.getId()+" newValue=\""+newValue+"\"");
+        editedDerivates.put(derivative.getId(),edited);
     }
 
     private void handleEditCurrentUnitPrice(Derivative derivative, Currency newValue) {
-        long id = derivative.getId();
         Derivative edited = editedDerivates.getOrDefault(derivative.getId(),derivative);
         edited.setCurrentUnitPrice(newValue);
-        Log.debug(TAG,"handleEditCurrentUnitPrice: derivative: id="+id+" newValue=\""+newValue+"\"");
-        editedDerivates.put(id,edited);
+        Log.debug(TAG,"handleEditCurrentUnitPrice: derivative: id="+derivative.getId()+" newValue=\""+newValue+"\"");
+        editedDerivates.put(derivative.getId(),edited);
+    }
+
+    private void handleEditAvgBuyPrice(Derivative derivative, Currency newValue) {
+        Derivative edited = editedDerivates.getOrDefault(derivative.getId(),derivative);
+        edited.setAvgBuyPrice(newValue);
+        Log.debug(TAG,"handleEditAvgBuyPrice: derivative: id="+derivative.getId()+" newValue=\""+newValue+"\"");
+        editedDerivates.put(derivative.getId(),edited);
     }
 
     private void handleDoubleClickRow(Derivative derivative) {

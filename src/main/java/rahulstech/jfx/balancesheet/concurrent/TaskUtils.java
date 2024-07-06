@@ -15,6 +15,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,7 +25,7 @@ import java.util.stream.IntStream;
 public class TaskUtils {
 
     public static <T> Task<T> createTask(Callable<T> callable, TaskCallback<T> onSuccess, TaskCallback<T> onFail){
-        Task<T> task = new Task<T>() {
+        Task<T> task = new Task<>() {
             @Override
             protected T call() throws Exception {
                 return callable.call();
@@ -117,11 +118,24 @@ public class TaskUtils {
         },onSuccess,onFail);
     }
 
+    /**
+     * this method only create a new categoy
+     */
     public static Task<Category> saveCategory(Category category, TaskCallback<Category> onSuccess,
                                               TaskCallback<Category> onFail) {
         return createTask(()->{
             CategoryDao dao = BalancesheetDb.getInstance().getCategoryDao();
-            return dao.insertOrUpdate(category);
+            dao.insertOrUpdate(Collections.singletonList(category));
+            return category;
+        },onSuccess,onFail);
+    }
+
+    public static Task<Void> updateCategories(Collection<Category> categories, TaskCallback<Void> onSuccess,
+                                                  TaskCallback<Void> onFail) {
+        return createTask(()->{
+            CategoryDao dao = BalancesheetDb.getInstance().getCategoryDao();
+            dao.insertOrUpdate(categories);
+            return null;
         },onSuccess,onFail);
     }
 
