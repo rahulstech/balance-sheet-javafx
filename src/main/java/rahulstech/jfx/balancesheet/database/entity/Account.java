@@ -16,7 +16,7 @@ public class Account {
     private String name;
 
     @DatabaseField(canBeNull = false, persisterClass = DbTypeCurrency.class)
-    private Currency balance;
+    private Currency balance = Currency.ZERO;
 
     // Constructors, getters, and setters
 

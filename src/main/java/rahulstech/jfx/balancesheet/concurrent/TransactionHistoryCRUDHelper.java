@@ -15,7 +15,7 @@ class TransactionHistoryCRUDHelper {
 
     TransactionHistoryCRUDHelper() {}
 
-    TransactionHistory save(BalancesheetDb db, TransactionHistory history) {
+    TransactionHistory save(BalancesheetDb db, TransactionHistory history) throws Exception {
         TransactionHistoryDao dao = db.getTransactionHistoryDao();
         boolean isEditing = 0!=history.getId();
         TransactionHistory old = isEditing ? dao.getTransactionHistoryById(history.getId()) : null;
@@ -50,12 +50,19 @@ class TransactionHistoryCRUDHelper {
         return db.getTransactionHistoryDao().queryForSameId(history);
     }
 
-    private void updateAccountBalance(Account account, Currency change) {
+    void updateAccountBalance(Account account, Currency change) throws Exception {
+        if (null==account) {
+            return;
+        }
         AccountDao dao = BalancesheetDb.getInstance().getAccountDao();
-        Currency balance = account.getBalance();
+        // it's found that the provided account may not contain the refreshed value.
+        // so fetch the account with most recent values first then update it
+        Account real = dao.queryForSameId(account);
+        Currency balance = real.getBalance();
         Currency newBalance = balance.add(change);
-        account.setBalance(newBalance);
-        dao.saveAccount(account);
+        real.setBalance(newBalance);
+        Log.debug(TAG,"updateAccountBalance: from="+balance+" to="+newBalance);
+        dao.saveAccount(real);
     }
 
     private Currency calculateAmountChangeForSrcAccount(TransactionHistory oldV, TransactionHistory newV) {
@@ -128,37 +135,5 @@ class TransactionHistoryCRUDHelper {
     private TransactionHistory saveHistory(TransactionHistory history) {
         TransactionHistoryDao dao = BalancesheetDb.getInstance().getTransactionHistoryDao();
         return dao.saveTransaction(history);
-    }
-
-    @Deprecated
-    private Currency calculateAmountChangeForSrcAccount(TransactionHistory history) {
-        Currency amount = history.getAmount();
-        Currency tax = null==history.getTax() || !history.isTaxSrc() ? Currency.ZERO : history.getTax();
-        TransactionType type = history.getType();
-        Currency change;
-        if (type == TransactionType.DEPOSIT) {
-            change = amount.negate().add(tax);
-        }
-        else {
-            change = amount.add(tax);
-        }
-        Log.trace(TAG,"calculateAmountChangeForSrcAccount(): change="+change);
-        return change;
-    }
-
-    @Deprecated
-    private Currency calculateAmountChangeForDestAccount(TransactionHistory history) {
-        Currency amount = history.getAmount();
-        Currency tax = null==history.getTax() || history.isTaxSrc() ? Currency.ZERO : history.getTax();
-        TransactionType type = history.getType();
-        Currency change;
-        if (type == TransactionType.TRANSFER) {
-            change = amount.negate().add(tax);
-        }
-        else {
-            change = Currency.ZERO;
-        }
-        Log.trace(TAG,"calculateAmountChangeForDestAccount(): change="+change);
-        return change;
     }
 }

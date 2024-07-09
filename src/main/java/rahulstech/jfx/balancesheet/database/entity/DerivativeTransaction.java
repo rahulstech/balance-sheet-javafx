@@ -126,7 +126,11 @@ public class DerivativeTransaction {
     }
 
     public Currency getValue() {
-        return Currency.from(price.getValue().multiply(volume));
+        Currency value = getValueWithOutTax();
+        if (null!=tax) {
+            value = value.subtract(tax);
+        }
+        return value;
     }
 
     @Override

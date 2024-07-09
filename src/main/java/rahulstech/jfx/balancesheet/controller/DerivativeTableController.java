@@ -75,6 +75,8 @@ public class DerivativeTableController extends Controller {
 
     private DerivativeTransactionTableController derivativeTransactionTableController;
 
+    private CreateDerivativeController createDerivativeController;
+
     @Override
     protected void onInitialize(ResourceBundle res) {
         // cell value factories
@@ -270,7 +272,7 @@ public class DerivativeTableController extends Controller {
                     setText(null);
                 }
                 else {
-                    updateTableCellTextStyleForNumberSign(this,item.compareTo(Currency.ZERO));
+                    updateTableCellTextStyleForNumberSign(this,item.getValue());
                     setText(TextUtil.prettyPrintCurrency(item));
                 }
             }
@@ -328,18 +330,8 @@ public class DerivativeTableController extends Controller {
         volumeColumn.setCellFactory(column->new TextFieldTableCell<>(TextUtil.getBigDecimalStringConverter(4)));
     }
 
-    @SuppressWarnings("rawtypes")
-    private void updateTableCellTextStyleForNumberSign(TableCell cell, int sign ) {
-        cell.getStyleClass().removeAll("text-debit","text-credit","text-body");
-        if (sign<0) {
-            cell.getStyleClass().add("text-debit");
-        }
-        else if (sign>0) {
-            cell.getStyleClass().add("text-credit");
-        }
-        else {
-            cell.getStyleClass().add("text-body");
-        }
+    private void updateTableCellTextStyleForNumberSign(TableCell<Derivative,?> cell, Number number ) {
+        TextUtil.setValueBasedTextStyleClass(number,cell);
     }
 
     private void setCellEditorHandler() {
@@ -449,11 +441,14 @@ public class DerivativeTableController extends Controller {
     }
 
     @FXML private void handleBuyDerivativeButtonClicked() {
+        if (createDerivativeController!=null && createDerivativeController.getWindow().isShowing()) {
+            return;
+        }
         ViewLauncher launcher = getViewLauncherBuilder()
                 .setFxml("create_derivative.fxml")
                 .setTitle("Buy New Derivative")
                 .build().load();
-        CreateDerivativeController createDerivativeController = launcher.getController();
+        createDerivativeController = launcher.getController();
         createDerivativeController.getWindow().show();
     }
 
@@ -491,6 +486,7 @@ public class DerivativeTableController extends Controller {
         }
         Task<DerivativeReportModel> task = DerivativeTasks.getOverallDervitiveReport();
         task.setOnSucceeded(e->setSummary(task.getValue()));
+        task.setOnFailed(e->Log.error(TAG,"prepareSummary",task.getException()));
         summaryTask = getApp().getAppExecutor().submit(task);
     }
 
@@ -519,12 +515,5 @@ public class DerivativeTableController extends Controller {
         if (null!=summaryTask) {
             summaryTask.cancel(true);
         }
-    }
-
-    private static class Summary {
-        Currency totalInvestment = Currency.ZERO;
-        Currency realProfit = Currency.ZERO;
-        Currency unrealizedPL = Currency.ZERO;
-        double percentChange = 0;
     }
 }

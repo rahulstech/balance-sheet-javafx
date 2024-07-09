@@ -190,12 +190,12 @@ public class InputTransactionHistoryController extends Controller {
     }
 
     private void setSrcAccountDisabled(boolean disabled) {
-        srcAccountPanel.setDisable(true);
+        srcAccountPanel.setDisable(disabled);
         buttonAddSrcAccount.setDisable(disabled);
     }
 
     private void setDestAccountDisabled(boolean disabled) {
-        destAccountPanel.setDisable(true);
+        destAccountPanel.setDisable(disabled);
         buttonAddDestAccount.setDisable(disabled);
     }
 

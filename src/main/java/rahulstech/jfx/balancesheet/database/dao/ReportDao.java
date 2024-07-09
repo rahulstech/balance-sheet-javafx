@@ -41,29 +41,25 @@ public class ReportDao {
                 DerivativeReportModel report = new DerivativeReportModel();
 
                 try (GenericRawResults<String[]> results = derivativeDao.queryRaw(queryDerivatives)) {
-                    if (null==results) {
-                        Log.info(TAG,"getOverallDerivativeReport: dervatives query result empty");
-                        return report;
-                    }
-                    String[] columns = results.getFirstResult();
+                    String[] columns = results.getResults().get(0);
                     Log.trace(TAG,"getOverallDerivativeReport: derivatives columns="+ Arrays.toString(columns));
-                    report.setTotalInvestedValue(Currency.from(columns[0]));
-                    report.setTotalRealizedPL(Currency.from(columns[1]));
-                    report.setTotalUnrealizedPL(Currency.from(columns[2]));
+                    report.setTotalInvestedValue(toCurrencyOrZEROOnEmpty(columns[0]));
+                    report.setTotalRealizedPL(toCurrencyOrZEROOnEmpty(columns[1]));
+                    report.setTotalUnrealizedPL(toCurrencyOrZEROOnEmpty(columns[2]));
                 }
 
                 try (GenericRawResults<String[]> results = transactionsDao.queryRaw(queryTax)) {
-                    if (null==results) {
-                        Log.info(TAG,"getOverallDerivativeReport: tax query result empty");
-                        return report;
-                    }
                     String[] columns = results.getFirstResult();
                     Log.trace(TAG,"getOverallDerivativeReport: derivative-transactions columns="+ Arrays.toString(columns));
-                    report.setTotalTax(Currency.from(columns[0]));
+                    report.setTotalTax(toCurrencyOrZEROOnEmpty(columns[0]));
                 }
 
                 return report;
             })
         );
+    }
+
+    private Currency toCurrencyOrZEROOnEmpty(String value) {
+        return null==value || value.isEmpty() ? Currency.ZERO : Currency.from(value);
     }
 }

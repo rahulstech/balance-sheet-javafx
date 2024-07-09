@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.stmt.QueryBuilder;
 import javafx.concurrent.Task;
 import rahulstech.jfx.balancesheet.database.BalancesheetDb;
+import rahulstech.jfx.balancesheet.database.dao.AccountDao;
 import rahulstech.jfx.balancesheet.database.dao.DerivativeDao;
 import rahulstech.jfx.balancesheet.database.dao.DerivativeTransactionDao;
 import rahulstech.jfx.balancesheet.database.entity.Account;
@@ -149,6 +150,7 @@ public class DerivativeTasks {
 
     DerivativeTransaction saveDerivativeTransaction(BalancesheetDb db, DerivativeTransaction transaction) throws Exception {
         boolean isEditing = transaction.getId()!=0;
+        DerivativeTType derivativeTType = transaction.getType();
         Currency amount = transaction.getValueWithOutTax();
         Derivative derivative = transaction.getDerivative();
         TransactionHistory history;
@@ -160,19 +162,18 @@ public class DerivativeTasks {
             history.setSrc(derivative.getDematAccount());
             history.setTaxSrc(true);
 
-            DerivativeTType derivativeTType = transaction.getType();
-            if (derivativeTType==DerivativeTType.BUY) {
-                // in case of sell and reward, derivative value is withdrawn from demat a/c
+            if (derivativeTType!=DerivativeTType.SELL) {
+                // in case of BUY and REWARD, derivative value is withdrawn from demat a/c
                 history.setType(TransactionType.WITHDRAW);
             } else {
-                // in case of sell and reward, derivative value is deposited to demat a/c
+                // in case of sell, derivative value is deposited to demat a/c
                 history.setType(TransactionType.DEPOSIT);
             }
         }
         history.setWhen(transaction.getWhen());
-        history.setAmount(amount);
+        // for REWARD no amount is withdrawn or deposited to account, so amount = 0
+        history.setAmount(derivativeTType==DerivativeTType.REWARD ? Currency.ZERO : amount);
         history.setTax(transaction.getTax());
-        history.setTaxSrc(true);
         history.setDescription(transaction.getDescription());
 
         // save the transaction history
@@ -306,44 +307,45 @@ public class DerivativeTasks {
 
     void deleteTransactionsForDerivative(BalancesheetDb db, Derivative derivative) throws Exception {
         DerivativeTransactionDao dao = db.getDerivativeTransactionsDao();
+        AccountDao accountDao = db.getAccountDao();
         // get all transactions for derivative
         List<DerivativeTransaction> transactions = db.getDerivativeTransactionsDao()
                 .queryBuilder().where().eq("derivative_id",derivative).query();
         if (null!=transactions) {
-            // NOTE: null check for account required, because user may accidentally delete the account
-            Account account = derivative.getDematAccount();
+            // query for the account to get the refreshed value always
+            Account account = accountDao.queryForSameId(derivative.getDematAccount());
             List<TransactionHistory> histories = new ArrayList<>();
             BigDecimal toBeAdded = BigDecimal.ZERO;
             BigDecimal toBeSubtracted = BigDecimal.ZERO;
             for (DerivativeTransaction transaction : transactions) {
+                // NOTE: null check for account required, because user may accidentally delete the account
                 if (null!=account) {
                     // value = volume * price
                     // value of BUY and REWARD transactions to be added
                     // all taxs to be added
                     // value of SELL transactions to be subtracted
-                    BigDecimal value = transaction.getVolume().multiply(transaction.getPrice().getValue());
+                    Currency balance = account.getBalance();
+                    Currency value = transaction.getValueWithOutTax();
+                    Currency tax = transaction.getTax();
                     DerivativeTType type = transaction.getType();
                     if (type == DerivativeTType.SELL) {
-                        toBeSubtracted = toBeSubtracted.add(value);
+                        balance = balance.subtract(value);
                     } else {
-                        toBeAdded = toBeAdded.add(value);
+                        balance = balance.add(value);
                     }
-                    toBeAdded = toBeAdded.add(transaction.getTax().getValue());
+                    if (null!=tax) {
+                        balance = balance.add(tax);
+                    }
+                    account.setBalance(balance);
                 }
-
                 // add the linked histories to be deleted
                 histories.add(transaction.getHistory());
             }
             if (null!=account) {
-                Currency changeInBalance = Currency.from(toBeAdded.subtract(toBeSubtracted));
-                Currency newBalance = account.getBalance().add(changeInBalance);
-
-                Log.debug(TAG, "deleteTransactionsForDerivative: account=" + account.getId() +
-                        " currentBalance=" + account.getBalance() + " newBalance=" + newBalance);
-
-                account.setBalance(newBalance);
+                Log.debug(TAG,"deleteTransactionsForDerivative: update account balance: id="+account.getId()+
+                        " balance="+account.getBalance());
                 // update the linked account's balance
-                db.getAccountDao().update(account);
+                accountDao.update(account);
             }
             // delete the histories
             db.getTransactionHistoryDao().delete(histories);

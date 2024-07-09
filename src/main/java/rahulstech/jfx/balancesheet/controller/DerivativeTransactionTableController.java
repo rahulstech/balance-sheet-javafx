@@ -9,12 +9,14 @@ import javafx.scene.control.*;
 import rahulstech.jfx.balancesheet.concurrent.DerivativeTasks;
 import rahulstech.jfx.balancesheet.database.entity.Derivative;
 import rahulstech.jfx.balancesheet.database.entity.DerivativeTransaction;
+import rahulstech.jfx.balancesheet.database.type.Currency;
 import rahulstech.jfx.balancesheet.database.type.DerivativeTType;
 import rahulstech.jfx.balancesheet.util.DialogUtil;
 import rahulstech.jfx.balancesheet.util.Log;
 import rahulstech.jfx.balancesheet.util.TextUtil;
 import rahulstech.jfx.balancesheet.util.ViewLauncher;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +50,13 @@ public class DerivativeTransactionTableController extends Controller {
     private TableColumn<DerivativeTransaction,String> typeColumn;
 
     @FXML
-    private TableColumn<DerivativeTransaction,Number> volumeColumn;
+    private TableColumn<DerivativeTransaction, BigDecimal> volumeColumn;
 
     @FXML
-    private TableColumn<DerivativeTransaction,Number> priceColumn;
+    private TableColumn<DerivativeTransaction, Currency> priceColumn;
 
     @FXML
-    private TableColumn<DerivativeTransaction,Number> taxColumn;
+    private TableColumn<DerivativeTransaction,Currency> taxColumn;
 
     @FXML
     private TableColumn<DerivativeTransaction,String> descriptionColumn;
@@ -141,7 +143,7 @@ public class DerivativeTransactionTableController extends Controller {
         });
         volumeColumn.setCellValueFactory(column->{
             DerivativeTransaction value = column.getValue();
-            Number cell_value;
+            BigDecimal cell_value;
             if (null==value) {
                 cell_value = null;
             }
@@ -152,23 +154,23 @@ public class DerivativeTransactionTableController extends Controller {
         });
         priceColumn.setCellValueFactory(column->{
             DerivativeTransaction value = column.getValue();
-            Number cell_value;
+            Currency cell_value;
             if (null==value) {
                 cell_value = null;
             }
             else {
-                cell_value = value.getPrice().getValue();
+                cell_value = value.getPrice();
             }
             return new SimpleObjectProperty<>(cell_value);
         });
         taxColumn.setCellValueFactory(column->{
             DerivativeTransaction value = column.getValue();
-            Number cell_value;
+            Currency cell_value;
             if (null==value) {
                 cell_value = null;
             }
             else {
-                cell_value = value.getTax().getValue();
+                cell_value = value.getTax();
             }
             return new SimpleObjectProperty<>(cell_value);
         });
@@ -198,6 +200,30 @@ public class DerivativeTransactionTableController extends Controller {
                     setText(item);
                     Tooltip tooltip = new Tooltip(item);
                     setTooltip(tooltip);
+                }
+            }
+        });
+        priceColumn.setCellFactory(col->new TableCell<>(){
+            @Override
+            protected void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setText(TextUtil.prettyPrintCurrency(item));
+                }
+            }
+        });
+        taxColumn.setCellFactory(col->new TableCell<>(){
+            @Override
+            protected void updateItem(Currency item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setText(TextUtil.prettyPrintCurrency(item));
                 }
             }
         });

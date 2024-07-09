@@ -24,8 +24,8 @@
 }
 
 /* Set text-fill color for any child inside the graphic of button */
-.button > .control-icon {
-    -fx-icon-color: onPrimary;
+* > .control-icon {
+   -fx-icon-color: onPrimary;
    -fx-icon-size: 20px;
 }
 

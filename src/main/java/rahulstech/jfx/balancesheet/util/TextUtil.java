@@ -1,6 +1,7 @@
 package rahulstech.jfx.balancesheet.util;
 
 import javafx.scene.Node;
+import javafx.scene.control.Cell;
 import javafx.scene.control.TextFormatter;
 import javafx.util.StringConverter;
 import rahulstech.jfx.balancesheet.database.type.Currency;
@@ -160,6 +161,21 @@ public class TextUtil {
         }
         else {
             node.getStyleClass().add("text-title-large");
+        }
+    }
+
+    public static void setValueBasedTextStyleClass(Number number, Cell<?> cell) {
+        BigDecimal value = number instanceof BigDecimal ? (BigDecimal) number : new BigDecimal(number.toString());
+        int compare = value.compareTo(BigDecimal.ZERO);
+        cell.getStyleClass().removeAll("text-debit","text-credit","text-body");
+        if (compare<0) {
+            cell.getStyleClass().add("text-debit");
+        }
+        else if (compare>0) {
+            cell.getStyleClass().add("text-credit");
+        }
+        else {
+            cell.getStyleClass().add("text-body");
         }
     }
 }

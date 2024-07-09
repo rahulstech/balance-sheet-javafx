@@ -185,6 +185,9 @@ public class CreateDerivativeController extends Controller{
     }
 
     private Account getDematAccount() {
+        if (accountFlowPane.getChildren().isEmpty()) {
+            return null;
+        }
         Node child = accountFlowPane.getChildren().get(0);
         if (null!=child) {
             return (Account) child.getUserData();
